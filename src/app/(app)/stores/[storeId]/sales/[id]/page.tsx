@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getSaleById } from "@/app/actions/sales";
+import { getUserStoreRole } from "@/app/actions/members";
 import { CancelSaleDialog } from "@/components/forms/cancel-sale-dialog";
 import { SaleVoucherDialog } from "@/components/receipt/sale-voucher-dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -48,6 +49,9 @@ export default async function SaleDetailPage({
 
   const data = await getSaleById(storeId, id);
   if (!data) notFound();
+
+  const role = await getUserStoreRole(storeId);
+  const canCancel = role === "owner" || role === "manager";
 
   const { sale, items, screenshots } = data;
   const t = await getTranslations();
@@ -101,7 +105,7 @@ export default async function SaleDetailPage({
             sale={sale}
             items={items}
           />
-          {isCompleted && (
+          {isCompleted && canCancel && (
             <CancelSaleDialog
               storeId={storeId}
               saleId={sale.id}

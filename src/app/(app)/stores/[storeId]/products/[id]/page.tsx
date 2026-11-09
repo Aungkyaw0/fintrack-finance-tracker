@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getProductById } from "@/app/actions/products";
+import { getUserStoreRole } from "@/app/actions/members";
 import { StockAdjustmentDialog } from "@/components/forms/stock-adjustment-dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,9 @@ export default async function ProductDetailPage({
 
   const { product, movements } = data;
   const t = await getTranslations();
+
+  const role = await getUserStoreRole(storeId);
+  const canViewCosts = role === "owner" || role === "manager";
 
   const cost = Number(product.costPrice) || 0;
   const sell = Number(product.sellingPrice) || 0;
@@ -99,12 +103,14 @@ export default async function ProductDetailPage({
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">
-          <StockAdjustmentDialog
-            storeId={storeId}
-            productId={product.id}
-            currentStock={product.currentStock}
-            productName={product.name}
-          />
+          {canViewCosts && (
+            <StockAdjustmentDialog
+              storeId={storeId}
+              productId={product.id}
+              currentStock={product.currentStock}
+              productName={product.name}
+            />
+          )}
         </div>
       </div>
 
@@ -171,36 +177,43 @@ export default async function ProductDetailPage({
             </CardContent>
           </Card>
 
-          {/* Unit Profit */}
-          <Card className="border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
-                {t("products.estimatedProfit")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
-                +{profitPerUnit.toLocaleString()} {store.currency}
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-2">
-                {t("products.margin")}: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{marginPercent}%</span>
-              </p>
-            </CardContent>
-          </Card>
+          {/* Unit Profit (Managers & Owners only) */}
+          {canViewCosts && (
+            <Card className="border bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
+                  {t("products.estimatedProfit")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
+                  +{profitPerUnit.toLocaleString()} {store.currency}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-2">
+                  {t("products.margin")}:{" "}
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                    {marginPercent}%
+                  </span>
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Cost Price */}
-          <Card className="border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
-                {t("products.costPrice")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">
-                {cost.toLocaleString()} {store.currency}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Cost Price (Managers & Owners only) */}
+          {canViewCosts && (
+            <Card className="border bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
+                  {t("products.costPrice")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">
+                  {cost.toLocaleString()} {store.currency}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Selling Price */}
           <Card className="border bg-card">

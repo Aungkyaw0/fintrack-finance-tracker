@@ -181,7 +181,10 @@ export default async function SalesPage({
                           </Badge>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-0.5">
-                          {new Date(s.soldAt).toLocaleString()}
+                          {new Date(s.soldAt).toLocaleString()} · By:{" "}
+                          <span className="font-medium text-foreground">
+                            {s.createdByName || s.createdByEmail || "Staff"}
+                          </span>
                         </p>
                       </div>
 
@@ -214,6 +217,7 @@ export default async function SalesPage({
                   <TableRow>
                     <TableHead>{t("sales.saleNumber")}</TableHead>
                     <TableHead>{t("common.date")}</TableHead>
+                    <TableHead>Cashier</TableHead>
                     <TableHead>{t("sales.paymentMethod")}</TableHead>
                     <TableHead>{t("common.notes")}</TableHead>
                     <TableHead className="text-right">{t("common.total")}</TableHead>
@@ -236,6 +240,9 @@ export default async function SalesPage({
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(s.soldAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-xs text-foreground font-medium">
+                        {s.createdByName || s.createdByEmail || "Staff"}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-xs font-normal">

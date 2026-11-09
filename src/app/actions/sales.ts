@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
 import {
   sales,
@@ -302,6 +303,13 @@ export async function cancelSaleAction(
 ) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return {
+      error: "Permission denied: Only store owners and managers can cancel sales.",
+    };
+  }
 
   try {
     await db.transaction(async (tx) => {

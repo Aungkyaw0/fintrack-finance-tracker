@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
 import {
   purchases,
@@ -136,6 +137,11 @@ export async function createPurchaseAction(
 
   const store = await getStoreById(storeId);
   if (!store) return { error: "Store not found" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff members cannot record inventory purchases." };
+  }
 
   if (!data.items || data.items.length === 0) {
     return { error: "At least one product is required for stock-in" };

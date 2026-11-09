@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
 import { expenses, users } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
@@ -61,6 +62,11 @@ export async function createExpenseAction(
 
   const store = await getStoreById(storeId);
   if (!store) return { error: "Store not found" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff members cannot record expenses." };
+  }
 
   const amount = Math.max(0, Number(data.amount) || 0);
   if (amount <= 0) {
