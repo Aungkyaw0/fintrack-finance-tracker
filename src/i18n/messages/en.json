@@ -22,6 +22,36 @@
     "no": "No",
     "or": "or"
   },
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "newSale": "New Sale",
+    "sales": "Sales",
+    "purchases": "Purchases",
+    "expenses": "Expenses",
+    "reports": "Reports",
+    "suppliers": "Suppliers",
+    "settings": "Settings",
+    "more": "More",
+    "allStores": "All Stores"
+  },
+  "status": {
+    "inStock": "In Stock",
+    "lowStock": "Low Stock",
+    "outOfStock": "Out of Stock",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded",
+    "pending": "Pending",
+    "sale": "Sale",
+    "purchase": "Purchase",
+    "adjustment": "Adjustment",
+    "loss": "Loss",
+    "damage": "Damage",
+    "correction": "Correction",
+    "return": "Return",
+    "other": "Other"
+  },
   "auth": {
     "login": "Sign In",
     "logout": "Sign Out",
@@ -53,10 +83,13 @@
     "netProfit": "Net Profit",
     "grossProfit": "Gross Profit",
     "todaySales": "Today's Sales",
-    "lowStockAlert": "Low Stock Alert",
+    "lowStockAlert": "Low Stock Alerts",
     "recentSales": "Recent Sales",
-    "salesChart": "Sales Chart",
-    "cashflow": "Cashflow"
+    "salesChart": "Sales Trend",
+    "cashflow": "Cashflow",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "cogs": "COGS"
   },
   "products": {
     "title": "Products",
@@ -72,8 +105,16 @@
     "description": "Description",
     "stockHistory": "Stock History",
     "noProducts": "No products yet.",
+    "inStock": "In Stock",
     "outOfStock": "Out of Stock",
-    "lowStock": "Low Stock"
+    "lowStock": "Low Stock",
+    "threshold": "Threshold",
+    "estimatedProfit": "Estimated Profit / Unit",
+    "margin": "Margin",
+    "stockAuditLog": "Audit log of all changes, sales, and purchases",
+    "stockBeforeAfter": "Stock Before → After",
+    "type": "Type",
+    "change": "Change"
   },
   "categories": {
     "title": "Categories",
@@ -99,10 +140,11 @@
     "cancelled": "Cancelled",
     "completed": "Completed",
     "refunded": "Refunded",
+    "soldItems": "Sold Items",
     "paymentMethods": {
       "cash": "Cash",
-      "kbz_pay": "KBZ Pay",
-      "wave_pay": "Wave Pay",
+      "kbz_pay": "KBZPay",
+      "wave_pay": "WavePay",
       "aya_pay": "AYA Pay",
       "bank_transfer": "Bank Transfer",
       "other": "Other"
@@ -115,7 +157,9 @@
     "supplier": "Supplier",
     "shippingCost": "Shipping Cost",
     "purchaseHistory": "Purchase History",
-    "noPurchases": "No purchases yet."
+    "noPurchases": "No purchases yet.",
+    "stockInItems": "Stock-In Items",
+    "unitCost": "Unit Cost"
   },
   "suppliers": {
     "title": "Suppliers",
@@ -157,14 +201,38 @@
   },
   "reports": {
     "title": "Reports",
+    "subtitle": "Profit & Loss, Cashflow and Margins",
     "monthly": "Monthly",
     "weekly": "Weekly",
     "daily": "Daily",
     "revenue": "Revenue",
     "expenses": "Expenses",
     "profit": "Profit",
-    "bestSelling": "Best Selling",
-    "cashflow": "Cashflow"
+    "bestSelling": "Best-Selling Products",
+    "bestSellingSub": "Highest revenue and volume",
+    "cashflow": "Cashflow",
+    "incomeStatement": "Income Statement (Profit & Loss)",
+    "lastDays": "Last {days} Days",
+    "pnlFormula": "Revenue − Cost of Goods Sold (COGS) − Operating Expenses",
+    "totalSalesRevenue": "Total Sales Revenue (+)",
+    "salesCount": "({count} sales)",
+    "cogsTitle": "Cost of Goods Sold (COGS) (−)",
+    "cogsSub": "(Product stock unit costs)",
+    "grossProfitTitle": "Gross Profit (=)",
+    "grossMargin": "Gross Margin",
+    "totalOperatingExpenses": "Total Operating Expenses (−)",
+    "operatingExpensesSub": "(Rent, delivery, ads, staff...)",
+    "netProfitTitle": "Net Profit",
+    "netMargin": "Net Margin",
+    "paymentBreakdown": "Payment Method Breakdown",
+    "paymentBreakdownSub": "Where customer money was collected",
+    "expensesByCategory": "Expenses by Category",
+    "noPaymentData": "No payment transactions recorded in this period.",
+    "noSalesData": "No sales recorded in this period.",
+    "unitsSold": "{count} units sold",
+    "days7": "7 Days",
+    "days30": "30 Days",
+    "days90": "90 Days"
   },
   "settings": {
     "title": "Settings",
@@ -177,9 +245,8 @@
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "notFound": "Not found.",
-    "unauthorized": "Unauthorized.",
-    "insufficientStock": "Insufficient stock.",
+    "unauthorized": "Unauthorized access.",
+    "insufficientStock": "Insufficient stock available.",
     "required": "This field is required."
   }
 }
-

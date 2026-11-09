@@ -123,7 +123,7 @@ export default async function ProductsPage({
         </CardContent>
       </Card>
 
-      {/* Products Table */}
+      {/* Products List */}
       {products.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
@@ -145,139 +145,234 @@ export default async function ProductsPage({
           </CardContent>
         </Card>
       ) : (
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead>{t("products.productName")}</TableHead>
-                  <TableHead>{t("categories.title")}</TableHead>
-                  <TableHead className="text-right">
-                    {t("products.costPrice")}
-                  </TableHead>
-                  <TableHead className="text-right">
-                    {t("products.sellingPrice")}
-                  </TableHead>
-                  <TableHead className="text-center">
-                    {t("products.currentStock")}
-                  </TableHead>
-                  <TableHead className="w-[80px] text-right">
-                    {t("common.actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((p) => {
-                  const isOutOfStock = p.currentStock <= 0;
-                  const isLowStock =
-                    !isOutOfStock && p.currentStock <= p.lowStockThreshold;
+        <>
+          {/* Mobile Card View (No horizontal scroll!) */}
+          <div className="space-y-3 md:hidden">
+            {products.map((p) => {
+              const isOutOfStock = p.currentStock <= 0;
+              const isLowStock =
+                !isOutOfStock && p.currentStock <= p.lowStockThreshold;
 
-                  return (
-                    <TableRow key={p.id} className="hover:bg-slate-50/70">
+              return (
+                <Link
+                  key={p.id}
+                  href={`/stores/${storeId}/products/${p.id}`}
+                  className="block"
+                >
+                  <Card className="hover:border-indigo-300 transition-colors bg-white">
+                    <CardContent className="p-3.5 flex items-center gap-3">
                       {/* Thumbnail */}
-                      <TableCell>
-                        <div className="w-11 h-11 rounded-lg bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
-                          {p.imageUrl ? (
-                            <Image
-                              src={p.imageUrl}
-                              alt={p.name}
-                              fill
-                              className="object-cover"
-                              sizes="44px"
-                            />
-                          ) : (
-                            <Package className="w-5 h-5 text-slate-400" />
+                      <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
+                        {p.imageUrl ? (
+                          <Image
+                            src={p.imageUrl}
+                            alt={p.name}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        ) : (
+                          <Package className="w-7 h-7 text-slate-400" />
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1">
+                          <h4 className="font-semibold text-sm text-gray-900 truncate">
+                            {p.name}
+                          </h4>
+                          <span className="font-bold text-sm text-gray-900 shrink-0">
+                            {Number(p.sellingPrice).toLocaleString()} {store.currency}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-1">
+                          {p.sku && (
+                            <span className="text-[11px] text-muted-foreground font-mono">
+                              {p.sku}
+                            </span>
+                          )}
+                          {p.categoryName && (
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-normal">
+                              <span
+                                className="w-1.5 h-1.5 rounded-full mr-1"
+                                style={{ backgroundColor: p.categoryColor || "#6366f1" }}
+                              />
+                              {p.categoryName}
+                            </Badge>
                           )}
                         </div>
-                      </TableCell>
 
-                      {/* Product Name & SKU */}
-                      <TableCell>
-                        <Link
-                          href={`/stores/${storeId}/products/${p.id}`}
-                          className="font-medium text-gray-900 hover:text-indigo-600 transition-colors line-clamp-1"
-                        >
-                          {p.name}
-                        </Link>
-                        {p.sku && (
-                          <span className="text-[11px] text-muted-foreground block font-mono">
-                            SKU: {p.sku}
+                        <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-100">
+                          <span className="text-[11px] text-muted-foreground">
+                            Cost: {Number(p.costPrice).toLocaleString()} {store.currency}
                           </span>
-                        )}
-                      </TableCell>
-
-                      {/* Category */}
-                      <TableCell>
-                        {p.categoryName ? (
                           <Badge
-                            variant="outline"
-                            className="text-xs font-normal"
+                            variant={
+                              isOutOfStock
+                                ? "destructive"
+                                : isLowStock
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-[10px] font-semibold py-0.5 ${
+                              isLowStock
+                                ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                                : ""
+                            }`}
                           >
-                            <span
-                              className="w-1.5 h-1.5 rounded-full mr-1.5"
-                              style={{
-                                backgroundColor: p.categoryColor || "#6366f1",
-                              }}
-                            />
-                            {p.categoryName}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-
-                      {/* Cost Price */}
-                      <TableCell className="text-right text-xs text-muted-foreground">
-                        {Number(p.costPrice).toLocaleString()} {store.currency}
-                      </TableCell>
-
-                      {/* Selling Price */}
-                      <TableCell className="text-right font-semibold text-xs sm:text-sm text-gray-900">
-                        {Number(p.sellingPrice).toLocaleString()} {store.currency}
-                      </TableCell>
-
-                      {/* Stock Badge */}
-                      <TableCell className="text-center">
-                        <Badge
-                          variant={
-                            isOutOfStock
-                              ? "destructive"
+                            {p.currentStock}{" "}
+                            {isOutOfStock
+                              ? `(${t("products.outOfStock")})`
                               : isLowStock
-                              ? "default"
-                              : "secondary"
-                          }
-                          className={`text-xs font-semibold ${
-                            isLowStock
-                              ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                              : ""
-                          }`}
-                        >
-                          {p.currentStock}{" "}
-                          {isOutOfStock
-                            ? `(${t("products.outOfStock")})`
-                            : isLowStock
-                            ? `(${t("products.lowStock")})`
-                            : ""}
-                        </Badge>
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell className="text-right">
-                        <Link href={`/stores/${storeId}/products/${p.id}`}>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-indigo-600">
-                            <Eye className="w-4 h-4 mr-1" />
-                            <span className="text-xs">View</span>
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                              ? `(${t("products.lowStock")})`
+                              : `(${t("products.inStock")})`}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
-        </Card>
+
+          {/* Desktop Table View */}
+          <Card className="hidden md:block overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">Image</TableHead>
+                    <TableHead>{t("products.productName")}</TableHead>
+                    <TableHead>{t("categories.title")}</TableHead>
+                    <TableHead className="text-right">
+                      {t("products.costPrice")}
+                    </TableHead>
+                    <TableHead className="text-right">
+                      {t("products.sellingPrice")}
+                    </TableHead>
+                    <TableHead className="text-center">
+                      {t("products.currentStock")}
+                    </TableHead>
+                    <TableHead className="w-[80px] text-right">
+                      {t("common.actions")}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {products.map((p) => {
+                    const isOutOfStock = p.currentStock <= 0;
+                    const isLowStock =
+                      !isOutOfStock && p.currentStock <= p.lowStockThreshold;
+
+                    return (
+                      <TableRow key={p.id} className="hover:bg-slate-50/70">
+                        {/* Thumbnail */}
+                        <TableCell>
+                          <div className="w-11 h-11 rounded-lg bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
+                            {p.imageUrl ? (
+                              <Image
+                                src={p.imageUrl}
+                                alt={p.name}
+                                fill
+                                className="object-cover"
+                                sizes="44px"
+                              />
+                            ) : (
+                              <Package className="w-5 h-5 text-slate-400" />
+                            )}
+                          </div>
+                        </TableCell>
+
+                        {/* Product Name & SKU */}
+                        <TableCell>
+                          <Link
+                            href={`/stores/${storeId}/products/${p.id}`}
+                            className="font-medium text-gray-900 hover:text-indigo-600 transition-colors line-clamp-1"
+                          >
+                            {p.name}
+                          </Link>
+                          {p.sku && (
+                            <span className="text-[11px] text-muted-foreground block font-mono">
+                              SKU: {p.sku}
+                            </span>
+                          )}
+                        </TableCell>
+
+                        {/* Category */}
+                        <TableCell>
+                          {p.categoryName ? (
+                            <Badge
+                              variant="outline"
+                              className="text-xs font-normal"
+                            >
+                              <span
+                                className="w-1.5 h-1.5 rounded-full mr-1.5"
+                                style={{
+                                  backgroundColor: p.categoryColor || "#6366f1",
+                                }}
+                              />
+                              {p.categoryName}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+
+                        {/* Cost Price */}
+                        <TableCell className="text-right text-xs text-muted-foreground">
+                          {Number(p.costPrice).toLocaleString()} {store.currency}
+                        </TableCell>
+
+                        {/* Selling Price */}
+                        <TableCell className="text-right font-semibold text-xs sm:text-sm text-gray-900">
+                          {Number(p.sellingPrice).toLocaleString()} {store.currency}
+                        </TableCell>
+
+                        {/* Stock Badge */}
+                        <TableCell className="text-center">
+                          <Badge
+                            variant={
+                              isOutOfStock
+                                ? "destructive"
+                                : isLowStock
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-xs font-semibold ${
+                              isLowStock
+                                ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                                : ""
+                            }`}
+                          >
+                            {p.currentStock}{" "}
+                            {isOutOfStock
+                              ? `(${t("products.outOfStock")})`
+                              : isLowStock
+                              ? `(${t("products.lowStock")})`
+                              : ""}
+                          </Badge>
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell className="text-right">
+                          <Link href={`/stores/${storeId}/products/${p.id}`}>
+                            <Button variant="ghost" size="sm" className="h-8 px-2 text-indigo-600">
+                              <Eye className="w-4 h-4 mr-1" />
+                              <span className="text-xs">View</span>
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </Card>
+        </>
       )}
     </div>
   );

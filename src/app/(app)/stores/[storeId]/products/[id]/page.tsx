@@ -52,6 +52,16 @@ export default async function ProductDetailPage({
   const isLowStock =
     !isOutOfStock && product.currentStock <= product.lowStockThreshold;
 
+  const MOVEMENT_LABELS: Record<string, string> = {
+    sale: t("status.sale") || "Sale",
+    purchase: t("status.purchase") || "Purchase",
+    adjustment: t("status.adjustment") || "Adjustment",
+    loss: t("status.loss") || "Loss",
+    damage: t("status.damage") || "Damage",
+    correction: t("status.correction") || "Correction",
+    return: t("status.return") || "Return",
+  };
+
   return (
     <div className="space-y-6">
       {/* Back button & Title */}
@@ -152,11 +162,11 @@ export default async function ProductDetailPage({
                     ? t("products.outOfStock")
                     : isLowStock
                     ? t("products.lowStock")
-                    : "In Stock"}
+                    : t("products.inStock")}
                 </Badge>
               </div>
               <p className="text-[11px] text-muted-foreground mt-2">
-                Threshold: {product.lowStockThreshold} units
+                {t("products.threshold")}: {product.lowStockThreshold} units
               </p>
             </CardContent>
           </Card>
@@ -165,7 +175,7 @@ export default async function ProductDetailPage({
           <Card className="border-indigo-100 bg-white">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
-                Estimated Profit / Unit
+                {t("products.estimatedProfit")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -173,7 +183,7 @@ export default async function ProductDetailPage({
                 +{profitPerUnit.toLocaleString()} {store.currency}
               </div>
               <p className="text-[11px] text-muted-foreground mt-2">
-                Margin: <span className="font-semibold text-emerald-600">{marginPercent}%</span>
+                {t("products.margin")}: <span className="font-semibold text-emerald-600">{marginPercent}%</span>
               </p>
             </CardContent>
           </Card>
@@ -218,7 +228,7 @@ export default async function ProductDetailPage({
                 {t("stock.movementHistory")}
               </CardTitle>
               <CardDescription className="text-xs">
-                Audit log of all changes, sales, and purchases
+                {t("products.stockAuditLog")}
               </CardDescription>
             </div>
           </div>
@@ -229,53 +239,95 @@ export default async function ProductDetailPage({
               No stock movements recorded yet.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[160px]">{t("common.date")}</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-center">Change</TableHead>
-                    <TableHead className="text-center">Stock Before → After</TableHead>
-                    <TableHead>{t("common.notes")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {movements.map((m) => {
-                    const isPositive = m.quantityChange > 0;
-                    return (
-                      <TableRow key={m.id} className="text-xs">
-                        <TableCell className="text-muted-foreground">
-                          {new Date(m.createdAt).toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="capitalize text-[11px]">
-                            {m.movementType}
+            <>
+              {/* Mobile Card Layout (Zero Horizontal Scrolling) */}
+              <div className="divide-y block md:hidden">
+                {movements.map((m) => {
+                  const isPositive = m.quantityChange > 0;
+                  return (
+                    <div key={m.id} className="py-3 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-[11px] font-medium">
+                            {MOVEMENT_LABELS[m.movementType] || m.movementType}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="text-center font-bold">
-                          <span
-                            className={
-                              isPositive ? "text-emerald-600" : "text-rose-600"
-                            }
-                          >
-                            {isPositive
-                              ? `+${m.quantityChange}`
-                              : m.quantityChange}
+                          <span className="text-[11px] text-muted-foreground">
+                            {new Date(m.createdAt).toLocaleDateString()}
                           </span>
-                        </TableCell>
-                        <TableCell className="text-center font-mono">
-                          {m.stockBefore} → <b>{m.stockAfter}</b>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground max-w-xs truncate">
-                          {m.notes || "—"}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                        </div>
+                        <span
+                          className={`text-sm font-bold ${
+                            isPositive ? "text-emerald-600" : "text-rose-600"
+                          }`}
+                        >
+                          {isPositive ? `+${m.quantityChange}` : m.quantityChange}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>
+                          {t("products.stockBeforeAfter")}: {m.stockBefore} →{" "}
+                          <strong className="text-foreground">{m.stockAfter}</strong>
+                        </span>
+                        {m.notes && (
+                          <span className="truncate max-w-[140px] italic">
+                            {m.notes}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[160px]">{t("common.date")}</TableHead>
+                      <TableHead>{t("products.type")}</TableHead>
+                      <TableHead className="text-center">{t("products.change")}</TableHead>
+                      <TableHead className="text-center">{t("products.stockBeforeAfter")}</TableHead>
+                      <TableHead>{t("common.notes")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {movements.map((m) => {
+                      const isPositive = m.quantityChange > 0;
+                      return (
+                        <TableRow key={m.id} className="text-xs">
+                          <TableCell className="text-muted-foreground">
+                            {new Date(m.createdAt).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize text-[11px]">
+                              {MOVEMENT_LABELS[m.movementType] || m.movementType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center font-bold">
+                            <span
+                              className={
+                                isPositive ? "text-emerald-600" : "text-rose-600"
+                              }
+                            >
+                              {isPositive
+                                ? `+${m.quantityChange}`
+                                : m.quantityChange}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center font-mono">
+                            {m.stockBefore} → <b>{m.stockAfter}</b>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground max-w-xs truncate">
+                            {m.notes || "—"}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

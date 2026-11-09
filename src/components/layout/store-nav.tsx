@@ -63,7 +63,7 @@ export function StoreNav({ storeId }: { storeId: string }) {
   ];
 
   return (
-    <div className="border-b bg-background sticky top-14 z-30 overflow-x-auto no-scrollbar">
+    <div className="hidden sm:block border-b bg-background sticky top-14 z-30 overflow-x-auto no-scrollbar">
       <nav className="flex items-center space-x-1 px-4 sm:px-6 py-1 min-w-max">
         {navItems.map((item) => {
           const Icon = item.icon;

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { db } from "@/lib/db";
-import { products, sales, expenses } from "@/lib/schema";
+import { products, sales, saleItems, expenses } from "@/lib/schema";
 import { eq, sql, desc, and } from "drizzle-orm";
 import {
   Card,
@@ -62,6 +62,16 @@ export default async function StoreDashboardPage({
     .from(sales)
     .where(and(eq(sales.storeId, storeId), eq(sales.status, "completed")));
 
+  // Calculate Cost of Goods Sold (COGS) from sold items
+  const [cogsSummary] = await db
+    .select({
+      totalCOGS: sql<string>`coalesce(sum(${saleItems.quantity} * ${products.costPrice}), 0)`,
+    })
+    .from(saleItems)
+    .innerJoin(sales, eq(sales.id, saleItems.saleId))
+    .innerJoin(products, eq(products.id, saleItems.productId))
+    .where(and(eq(sales.storeId, storeId), eq(sales.status, "completed")));
+
   const [expensesSummary] = await db
     .select({
       totalExpense: sql<string>`coalesce(sum(${expenses.amount}), 0)`,
@@ -88,8 +98,10 @@ export default async function StoreDashboardPage({
     .limit(5);
 
   const revenueNum = Number(salesSummary?.totalRevenue || 0);
+  const cogsNum = Number(cogsSummary?.totalCOGS || 0);
   const expenseNum = Number(expensesSummary?.totalExpense || 0);
-  const netProfitNum = revenueNum - expenseNum;
+  const grossProfitNum = revenueNum - cogsNum;
+  const netProfitNum = grossProfitNum - expenseNum;
 
   const formatCurrency = (val: number) => {
     return `${val.toLocaleString()} ${store.currency}`;
@@ -199,7 +211,7 @@ export default async function StoreDashboardPage({
               {formatCurrency(netProfitNum)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t("dashboard.revenue")} − {t("dashboard.expenses")}
+              {t("dashboard.revenue")} − {t("dashboard.cogs")} − {t("dashboard.expenses")}
             </p>
           </CardContent>
         </Card>

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -53,9 +54,11 @@ export function StoreSwitcher({
           }
         />
         <DropdownMenuContent align="start" className="w-[240px]">
-          <DropdownMenuLabel className="text-xs text-muted-foreground">
-            {t("stores.myStores")}
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              {t("stores.myStores")}
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
