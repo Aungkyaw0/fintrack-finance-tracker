@@ -1,8 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getStoreReport } from "@/app/actions/reports";
+import { getUserStoreRole } from "@/app/actions/members";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
+import { PrintReportButton } from "@/components/receipt/print-report-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -40,6 +43,11 @@ export default async function ReportsPage({
   const store = await getStoreById(storeId);
   if (!store) notFound();
 
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    redirect(`/stores/${storeId}/dashboard`);
+  }
+
   const days = daysParam ? parseInt(daysParam) || 30 : 30;
   const report = await getStoreReport(storeId, days);
   const t = await getTranslations();
@@ -74,25 +82,44 @@ export default async function ReportsPage({
           </p>
         </div>
 
-        {/* Days Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-muted p-1 rounded-xl">
-          {[
-            { label: t("reports.days7"), d: 7 },
-            { label: t("reports.days30"), d: 30 },
-            { label: t("reports.days90"), d: 90 },
-          ].map((item) => (
-            <Link
-              key={item.d}
-              href={`/stores/${storeId}/reports?days=${item.d}`}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
-                days === item.d
-                  ? "bg-background text-primary shadow-xs font-bold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Days Filter Pills */}
+          <div className="flex items-center gap-1.5 bg-muted p-1 rounded-xl">
+            {[
+              { label: t("reports.days7"), d: 7 },
+              { label: t("reports.days30"), d: 30 },
+              { label: t("reports.days90"), d: 90 },
+            ].map((item) => (
+              <Link
+                key={item.d}
+                href={`/stores/${storeId}/reports?days=${item.d}`}
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                  days === item.d
+                    ? "bg-background text-primary shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          <ExportCsvButton
+            label="Export P&L"
+            filename={`${store.name}-pnl-statement-${days}days`}
+            headers={["Financial Metric", `Amount / Value (${store.currency})`]}
+            rows={[
+              ["Total Sales Revenue", report.totalRevenue],
+              ["Cost of Goods Sold (COGS)", report.totalCOGS],
+              ["Gross Profit", report.grossProfit],
+              ["Gross Margin (%)", `${grossMarginPercent}%`],
+              ["Total Operating Expenses", report.totalExpenses],
+              ["Net Profit", report.netProfit],
+              ["Net Margin (%)", `${netMarginPercent}%`],
+            ]}
+          />
+
+          <PrintReportButton label="Print Report" />
         </div>
       </div>
 

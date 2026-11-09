@@ -15,52 +15,70 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function StoreNav({ storeId }: { storeId: string }) {
+export function StoreNav({
+  storeId,
+  userRole = "staff",
+}: {
+  storeId: string;
+  userRole?: "owner" | "manager" | "staff";
+}) {
   const t = useTranslations();
   const pathname = usePathname();
 
-  const navItems = [
+  const allNavItems = [
     {
       title: t("dashboard.title"),
       href: `/stores/${storeId}/dashboard`,
       icon: LayoutDashboard,
+      roles: ["owner", "manager", "staff"],
     },
     {
       title: t("products.title"),
       href: `/stores/${storeId}/products`,
       icon: Package,
+      roles: ["owner", "manager", "staff"],
     },
     {
       title: t("sales.title"),
       href: `/stores/${storeId}/sales`,
       icon: ShoppingCart,
+      roles: ["owner", "manager", "staff"],
     },
     {
       title: t("purchases.title"),
       href: `/stores/${storeId}/purchases`,
       icon: Truck,
+      roles: ["owner", "manager"],
     },
     {
       title: t("expenses.title"),
       href: `/stores/${storeId}/expenses`,
       icon: Receipt,
+      roles: ["owner", "manager"],
     },
     {
       title: t("suppliers.title"),
       href: `/stores/${storeId}/suppliers`,
       icon: Users,
+      roles: ["owner", "manager"],
     },
     {
       title: t("reports.title"),
       href: `/stores/${storeId}/reports`,
       icon: BarChart3,
+      roles: ["owner", "manager"],
     },
     {
       title: t("settings.title"),
       href: `/stores/${storeId}/settings`,
       icon: Settings,
+      roles: ["owner", "manager"],
     },
   ];
+
+  const navItems = allNavItems.filter((item) =>
+    item.roles.includes(userRole)
+  );
 
   return (
     <div className="hidden sm:block border-b bg-background sticky top-14 z-30 overflow-x-auto no-scrollbar">

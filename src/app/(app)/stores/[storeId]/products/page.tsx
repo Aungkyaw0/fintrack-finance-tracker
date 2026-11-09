@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getProducts } from "@/app/actions/products";
 import { getCategories } from "@/app/actions/categories";
+import { getUserStoreRole } from "@/app/actions/members";
 import { CategoryManagerDialog } from "@/components/forms/category-manager-dialog";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,12 +42,45 @@ export default async function ProductsPage({
   const store = await getStoreById(storeId);
   if (!store) notFound();
 
+  const role = await getUserStoreRole(storeId);
+  const canManage = role === "owner" || role === "manager";
+
   const t = await getTranslations();
   const products = await getProducts(storeId, {
     search: q,
     categoryId: category,
   });
   const categories = await getCategories(storeId);
+
+  const productCsvHeaders = [
+    "Product Name",
+    "SKU",
+    "Category",
+    ...(canManage ? [`Cost Price (${store.currency})`] : []),
+    `Selling Price (${store.currency})`,
+    "Current Stock",
+    "Low Stock Threshold",
+    ...(canManage ? [`Total Stock Value (${store.currency})`] : []),
+    "Status",
+  ];
+
+  const productCsvRows = products.map((p) => [
+    p.name,
+    p.sku || "",
+    p.categoryName || "Uncategorized",
+    ...(canManage ? [Number(p.costPrice) || 0] : []),
+    Number(p.sellingPrice) || 0,
+    p.currentStock,
+    p.lowStockThreshold,
+    ...(canManage ? [(Number(p.costPrice) || 0) * p.currentStock] : []),
+    p.isActive
+      ? p.currentStock <= p.lowStockThreshold
+        ? p.currentStock === 0
+          ? "Out of Stock"
+          : "Low Stock"
+        : "In Stock"
+      : "Inactive",
+  ]);
 
   return (
     <div className="space-y-6">
@@ -61,16 +96,25 @@ export default async function ProductsPage({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <CategoryManagerDialog
-            storeId={storeId}
-            categories={categories}
+          <ExportCsvButton
+            filename={`${store.name}-products-${new Date().toISOString().slice(0, 10)}`}
+            headers={productCsvHeaders}
+            rows={productCsvRows}
           />
-          <Link href={`/stores/${storeId}/products/new`}>
-            <Button className="gap-1.5 shadow-sm font-semibold">
-              <Plus className="w-4 h-4" />
-              <span>{t("products.addProduct")}</span>
-            </Button>
-          </Link>
+          {canManage && (
+            <>
+              <CategoryManagerDialog
+                storeId={storeId}
+                categories={categories}
+              />
+              <Link href={`/stores/${storeId}/products/new`}>
+                <Button className="gap-1.5 shadow-sm font-semibold">
+                  <Plus className="w-4 h-4" />
+                  <span>{t("products.addProduct")}</span>
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -205,9 +249,15 @@ export default async function ProductsPage({
                         </div>
 
                         <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/60">
-                          <span className="text-[11px] text-muted-foreground">
-                            Cost: {Number(p.costPrice).toLocaleString()} {store.currency}
-                          </span>
+                          {canManage ? (
+                            <span className="text-[11px] text-muted-foreground">
+                              Cost: {Number(p.costPrice).toLocaleString()} {store.currency}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">
+                              {p.sku || ""}
+                            </span>
+                          )}
                           <Badge
                             variant={
                               isOutOfStock
@@ -247,9 +297,11 @@ export default async function ProductsPage({
                     <TableHead className="w-[80px]">Image</TableHead>
                     <TableHead>{t("products.productName")}</TableHead>
                     <TableHead>{t("categories.title")}</TableHead>
-                    <TableHead className="text-right">
-                      {t("products.costPrice")}
-                    </TableHead>
+                    {canManage && (
+                      <TableHead className="text-right">
+                        {t("products.costPrice")}
+                      </TableHead>
+                    )}
                     <TableHead className="text-right">
                       {t("products.sellingPrice")}
                     </TableHead>
@@ -322,9 +374,11 @@ export default async function ProductsPage({
                         </TableCell>
 
                         {/* Cost Price */}
-                        <TableCell className="text-right text-xs text-muted-foreground">
-                          {Number(p.costPrice).toLocaleString()} {store.currency}
-                        </TableCell>
+                        {canManage && (
+                          <TableCell className="text-right text-xs text-muted-foreground">
+                            {Number(p.costPrice).toLocaleString()} {store.currency}
+                          </TableCell>
+                        )}
 
                         {/* Selling Price */}
                         <TableCell className="text-right font-semibold text-xs sm:text-sm text-foreground">

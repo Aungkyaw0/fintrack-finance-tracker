@@ -61,7 +61,10 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${geist.variable} font-sans antialiased bg-background text-foreground min-h-screen`}>
+      <body
+        suppressHydrationWarning
+        className={`${geist.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

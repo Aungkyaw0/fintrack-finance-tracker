@@ -29,9 +29,10 @@ import { ThemeToggle } from "./theme-toggle";
 
 interface BottomNavProps {
   storeId?: string;
+  userRole?: "owner" | "manager" | "staff";
 }
 
-export function BottomNav({ storeId }: BottomNavProps) {
+export function BottomNav({ storeId, userRole = "staff" }: BottomNavProps) {
   const pathname = usePathname();
   const [openMore, setOpenMore] = useState(false);
   const t = useTranslations("nav");
@@ -70,44 +71,54 @@ export function BottomNav({ storeId }: BottomNavProps) {
     },
   ];
 
-  const moreItems = [
+  const allMoreItems = [
     {
       title: t("purchases"),
       href: `${basePath}/purchases`,
       icon: Truck,
       desc: "Stock-in & supplier invoices",
+      roles: ["owner", "manager"],
     },
     {
       title: t("expenses"),
       href: `${basePath}/expenses`,
       icon: Receipt,
       desc: "Operating costs & receipts",
+      roles: ["owner", "manager"],
     },
     {
       title: t("reports"),
       href: `${basePath}/reports`,
       icon: BarChart3,
       desc: "P&L, Margins & Cashflow",
+      roles: ["owner", "manager"],
     },
     {
       title: t("suppliers"),
       href: `${basePath}/suppliers`,
       icon: Users,
       desc: "Supplier directory & balances",
+      roles: ["owner", "manager"],
     },
     {
       title: t("settings"),
       href: `${basePath}/settings`,
       icon: Settings,
       desc: "Store profile & preferences",
+      roles: ["owner", "manager"],
     },
     {
       title: t("allStores") || "All Stores",
       href: "/dashboard",
       icon: Store,
       desc: "Switch or create a store",
+      roles: ["owner", "manager", "staff"],
     },
   ];
+
+  const moreItems = allMoreItems.filter((item) =>
+    item.roles.includes(userRole)
+  );
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-md pb-safe md:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">

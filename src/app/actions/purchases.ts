@@ -10,6 +10,7 @@ import {
   stockMovements,
   paymentScreenshots,
   suppliers,
+  users,
 } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -45,9 +46,12 @@ export async function getPurchases(storeId: string) {
         notes: purchases.notes,
         purchasedAt: purchases.purchasedAt,
         createdAt: purchases.createdAt,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
       })
       .from(purchases)
       .leftJoin(suppliers, eq(suppliers.id, purchases.supplierId))
+      .leftJoin(users, eq(users.id, purchases.createdBy))
       .where(eq(purchases.storeId, storeId))
       .orderBy(desc(purchases.purchasedAt));
 
@@ -76,9 +80,12 @@ export async function getPurchaseById(storeId: string, purchaseId: string) {
         status: purchases.status,
         notes: purchases.notes,
         purchasedAt: purchases.purchasedAt,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
       })
       .from(purchases)
       .leftJoin(suppliers, eq(suppliers.id, purchases.supplierId))
+      .leftJoin(users, eq(users.id, purchases.createdBy))
       .where(
         and(eq(purchases.id, purchaseId), eq(purchases.storeId, storeId))
       )

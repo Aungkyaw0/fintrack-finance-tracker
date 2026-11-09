@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getSaleById } from "@/app/actions/sales";
 import { CancelSaleDialog } from "@/components/forms/cancel-sale-dialog";
+import { SaleVoucherDialog } from "@/components/receipt/sale-voucher-dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,19 +77,38 @@ export default async function SaleDetailPage({
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {new Date(sale.soldAt).toLocaleString()} · {METHOD_LABELS[sale.paymentMethod] || sale.paymentMethod}
+              {new Date(sale.soldAt).toLocaleString()} ·{" "}
+              {METHOD_LABELS[sale.paymentMethod] || sale.paymentMethod}
+              {(sale.createdByName || sale.createdByEmail) && (
+                <>
+                  {" "}· Recorded by:{" "}
+                  <b className="font-semibold text-foreground">
+                    {sale.createdByName || sale.createdByEmail}
+                  </b>
+                </>
+              )}
             </p>
           </div>
         </div>
 
-        {/* Cancellation CTA if completed */}
-        {isCompleted && (
-          <CancelSaleDialog
-            storeId={storeId}
-            saleId={sale.id}
-            saleNumber={sale.saleNumber}
+        <div className="flex items-center gap-2 flex-wrap">
+          <SaleVoucherDialog
+            store={{
+              name: store.name,
+              description: store.description,
+              currency: store.currency,
+            }}
+            sale={sale}
+            items={items}
           />
-        )}
+          {isCompleted && (
+            <CancelSaleDialog
+              storeId={storeId}
+              saleId={sale.id}
+              saleNumber={sale.saleNumber}
+            />
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

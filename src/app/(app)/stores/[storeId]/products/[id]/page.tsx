@@ -267,6 +267,11 @@ export default async function ProductDetailPage({
                         <span>
                           {t("products.stockBeforeAfter")}: {m.stockBefore} →{" "}
                           <strong className="text-foreground">{m.stockAfter}</strong>
+                          {(m.createdByName || m.createdByEmail) && (
+                            <span className="block text-[10px] text-muted-foreground">
+                              By: {m.createdByName || m.createdByEmail}
+                            </span>
+                          )}
                         </span>
                         {m.notes && (
                           <span className="truncate max-w-[140px] italic">
@@ -288,6 +293,7 @@ export default async function ProductDetailPage({
                       <TableHead>{t("products.type")}</TableHead>
                       <TableHead className="text-center">{t("products.change")}</TableHead>
                       <TableHead className="text-center">{t("products.stockBeforeAfter")}</TableHead>
+                      <TableHead>Staff / User</TableHead>
                       <TableHead>{t("common.notes")}</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -317,6 +323,9 @@ export default async function ProductDetailPage({
                           </TableCell>
                           <TableCell className="text-center font-mono">
                             {m.stockBefore} → <b>{m.stockAfter}</b>
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {m.createdByName || m.createdByEmail || "System"}
                           </TableCell>
                           <TableCell className="text-muted-foreground max-w-xs truncate">
                             {m.notes || "—"}

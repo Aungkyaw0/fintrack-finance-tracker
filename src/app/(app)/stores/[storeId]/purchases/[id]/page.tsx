@@ -52,6 +52,14 @@ export default async function PurchaseDetailPage({
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             {new Date(purchase.purchasedAt).toLocaleString()}
+            {(purchase.createdByName || purchase.createdByEmail) && (
+              <>
+                {" "}· Purchased by:{" "}
+                <b className="font-semibold text-foreground">
+                  {purchase.createdByName || purchase.createdByEmail}
+                </b>
+              </>
+            )}
           </p>
         </div>
       </div>

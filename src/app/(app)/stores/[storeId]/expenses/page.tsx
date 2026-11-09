@@ -1,8 +1,10 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getExpenses } from "@/app/actions/expenses";
+import { getUserStoreRole } from "@/app/actions/members";
 import { ExpenseDialog } from "@/components/forms/expense-dialog";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,8 +38,29 @@ export default async function ExpensesPage({
   const store = await getStoreById(storeId);
   if (!store) notFound();
 
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    redirect(`/stores/${storeId}/dashboard`);
+  }
+
   const expenses = await getExpenses(storeId);
   const t = await getTranslations();
+
+  const expenseCsvHeaders = [
+    "Date",
+    "Category",
+    `Amount (${store.currency})`,
+    "Description",
+    "Recorded By",
+  ];
+
+  const expenseCsvRows = expenses.map((e) => [
+    new Date(e.expenseDate).toLocaleDateString(),
+    CAT_LABELS[e.category] || e.category,
+    Number(e.amount) || 0,
+    e.description || "",
+    e.createdByName || e.createdByEmail || "Staff",
+  ]);
 
   const totalExpenseSum = expenses.reduce(
     (acc, e) => acc + Number(e.amount),
@@ -61,7 +84,14 @@ export default async function ExpensesPage({
           </p>
         </div>
 
-        <ExpenseDialog storeId={storeId} currency={store.currency} />
+        <div className="flex items-center gap-2 flex-wrap">
+          <ExportCsvButton
+            filename={`${store.name}-expenses-${new Date().toISOString().slice(0, 10)}`}
+            headers={expenseCsvHeaders}
+            rows={expenseCsvRows}
+          />
+          <ExpenseDialog storeId={storeId} currency={store.currency} />
+        </div>
       </div>
 
       {/* Expenses List */}

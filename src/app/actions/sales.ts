@@ -9,6 +9,7 @@ import {
   products,
   stockMovements,
   paymentScreenshots,
+  users,
 } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -65,8 +66,24 @@ export async function getSales(
     }
 
     const rows = await db
-      .select()
+      .select({
+        id: sales.id,
+        storeId: sales.storeId,
+        createdBy: sales.createdBy,
+        saleNumber: sales.saleNumber,
+        subtotal: sales.subtotal,
+        discountAmount: sales.discountAmount,
+        totalAmount: sales.totalAmount,
+        paymentMethod: sales.paymentMethod,
+        notes: sales.notes,
+        status: sales.status,
+        soldAt: sales.soldAt,
+        createdAt: sales.createdAt,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
+      })
       .from(sales)
+      .leftJoin(users, eq(users.id, sales.createdBy))
       .where(and(...conditions))
       .orderBy(desc(sales.soldAt));
 
@@ -82,13 +99,24 @@ export async function getSaleById(storeId: string, saleId: string) {
     const store = await getStoreById(storeId);
     if (!store) return null;
 
-    const [sale] = await db
-      .select()
+    const [row] = await db
+      .select({
+        sale: sales,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
+      })
       .from(sales)
+      .leftJoin(users, eq(users.id, sales.createdBy))
       .where(and(eq(sales.id, saleId), eq(sales.storeId, storeId)))
       .limit(1);
 
-    if (!sale) return null;
+    if (!row) return null;
+
+    const sale = {
+      ...row.sale,
+      createdByName: row.createdByName,
+      createdByEmail: row.createdByEmail,
+    };
 
     // Fetch items
     const items = await db

@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getSuppliers } from "@/app/actions/suppliers";
+import { getUserStoreRole } from "@/app/actions/members";
 import { SupplierDialog } from "@/components/forms/supplier-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,11 @@ export default async function SuppliersPage({
   const { storeId } = await params;
   const store = await getStoreById(storeId);
   if (!store) notFound();
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    redirect(`/stores/${storeId}/dashboard`);
+  }
 
   const suppliers = await getSuppliers(storeId);
   const t = await getTranslations();

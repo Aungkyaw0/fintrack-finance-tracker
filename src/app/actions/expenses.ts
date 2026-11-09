@@ -3,7 +3,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
 import { db } from "@/lib/db";
-import { expenses } from "@/lib/schema";
+import { expenses, users } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -30,8 +30,20 @@ export async function getExpenses(
     }
 
     return await db
-      .select()
+      .select({
+        id: expenses.id,
+        storeId: expenses.storeId,
+        category: expenses.category,
+        amount: expenses.amount,
+        description: expenses.description,
+        receiptUrl: expenses.receiptUrl,
+        expenseDate: expenses.expenseDate,
+        createdAt: expenses.createdAt,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
+      })
       .from(expenses)
+      .leftJoin(users, eq(users.id, expenses.createdBy))
       .where(and(...conditions))
       .orderBy(desc(expenses.expenseDate));
   } catch (error) {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
 import { products, sales, saleItems, expenses } from "@/lib/schema";
 import { eq, sql, desc, and } from "drizzle-orm";
@@ -37,6 +38,9 @@ export default async function StoreDashboardPage({
   const { storeId } = await params;
   const store = await getStoreById(storeId);
   if (!store) notFound();
+
+  const role = await getUserStoreRole(storeId);
+  const isStaff = role === "staff";
 
   const t = await getTranslations();
 
@@ -173,64 +177,105 @@ export default async function StoreDashboardPage({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
               <Wallet className="w-4 h-4 text-emerald-400" />
-              <span>{t("dashboard.netProfit")}</span>
+              <span>
+                {isStaff ? t("dashboard.revenue") : t("dashboard.netProfit")}
+              </span>
             </div>
             <span className="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200 backdrop-blur-xs">
-              {t("reports.grossMargin")}: {grossMargin}%
+              {isStaff
+                ? `${salesSummary?.count || 0} Transactions`
+                : `${t("reports.grossMargin")}: ${grossMargin}%`}
             </span>
           </div>
 
           <div>
             <div className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              <span className={isNetPositive ? "text-emerald-400" : "text-rose-400"}>
-                {isNetPositive ? "+" : "−"}
-                {formatCurrency(Math.abs(netProfitNum))}
+              <span className="text-emerald-400">
+                +{formatCurrency(isStaff ? revenueNum : Math.abs(netProfitNum))}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
-              {t("reports.pnlFormula")}
+              {isStaff
+                ? "Total completed sales revenue"
+                : t("reports.pnlFormula")}
             </p>
           </div>
 
-          {/* 3 Pillars Breakdown */}
-          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-left">
-            <div>
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
-                {t("dashboard.revenue")}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-emerald-300 block truncate">
-                +{formatCurrency(revenueNum)}
-              </span>
-              <span className="text-[10px] text-slate-400">
-                {salesSummary?.count || 0} {t("sales.title")}
-              </span>
+          {/* Pillars Breakdown */}
+          {isStaff ? (
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-left">
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  Total Sales
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-emerald-300 block truncate">
+                  {salesSummary?.count || 0}
+                </span>
+                <span className="text-[10px] text-slate-400">Recorded</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  Products
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-indigo-300 block truncate">
+                  {productsCount?.count || 0}
+                </span>
+                <span className="text-[10px] text-slate-400">In Catalog</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  Low Stock
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-amber-300 block truncate">
+                  {lowStockCount?.count || 0}
+                </span>
+                <span className="text-[10px] text-slate-400">Alerts</span>
+              </div>
             </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-left">
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  {t("dashboard.revenue")}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-emerald-300 block truncate">
+                  +{formatCurrency(revenueNum)}
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  {salesSummary?.count || 0} {t("sales.title")}
+                </span>
+              </div>
 
-            <div>
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
-                {t("dashboard.cogs")}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-amber-300 block truncate">
-                −{formatCurrency(cogsNum)}
-              </span>
-              <span className="text-[10px] text-slate-400">Stock cost</span>
-            </div>
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  {t("dashboard.cogs")}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-amber-300 block truncate">
+                  −{formatCurrency(cogsNum)}
+                </span>
+                <span className="text-[10px] text-slate-400">Stock cost</span>
+              </div>
 
-            <div>
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
-                {t("dashboard.expenses")}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-rose-300 block truncate">
-                −{formatCurrency(expenseNum)}
-              </span>
-              <span className="text-[10px] text-slate-400">Operating</span>
+              <div>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">
+                  {t("dashboard.expenses")}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-rose-300 block truncate">
+                  −{formatCurrency(expenseNum)}
+                </span>
+                <span className="text-[10px] text-slate-400">Operating</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Quick Actions Hub (Touch-First Action Grid for Mobile & Tablet) */}
-      <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
+      <div
+        className={`grid ${
+          isStaff ? "grid-cols-2" : "grid-cols-4"
+        } gap-2.5 sm:gap-4`}
+      >
         {/* New Sale */}
         <Link
           href={`/stores/${storeId}/sales/new`}
@@ -244,44 +289,65 @@ export default async function StoreDashboardPage({
           </span>
         </Link>
 
+        {/* View Products */}
+        {isStaff && (
+          <Link
+            href={`/stores/${storeId}/products`}
+            className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
+              <Package className="w-5 h-5" />
+            </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
+              {t("products.title")}
+            </span>
+          </Link>
+        )}
+
         {/* Stock In */}
-        <Link
-          href={`/stores/${storeId}/purchases/new`}
-          className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
-        >
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-            <Truck className="w-5 h-5" />
-          </div>
-          <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
-            {t("purchases.newPurchase")}
-          </span>
-        </Link>
+        {!isStaff && (
+          <Link
+            href={`/stores/${storeId}/purchases/new`}
+            className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
+              <Truck className="w-5 h-5" />
+            </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
+              {t("purchases.newPurchase")}
+            </span>
+          </Link>
+        )}
 
         {/* Add Expense */}
-        <Link
-          href={`/stores/${storeId}/expenses`}
-          className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
-        >
-          <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-            <Receipt className="w-5 h-5" />
-          </div>
-          <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
-            {t("expenses.addExpense")}
-          </span>
-        </Link>
+        {!isStaff && (
+          <Link
+            href={`/stores/${storeId}/expenses`}
+            className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
+          >
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
+              <Receipt className="w-5 h-5" />
+            </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
+              {t("expenses.addExpense")}
+            </span>
+          </Link>
+        )}
 
         {/* Add Product */}
-        <Link
-          href={`/stores/${storeId}/products/new`}
-          className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
-        >
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-            <Package className="w-5 h-5" />
-          </div>
-          <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
-            {t("products.addProduct")}
-          </span>
-        </Link>
+        {!isStaff && (
+          <Link
+            href={`/stores/${storeId}/products/new`}
+            className="flex flex-col items-center justify-center p-3 rounded-xl border bg-card hover:bg-accent/40 active:scale-95 transition-all text-center group shadow-2xs"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
+              <Package className="w-5 h-5" />
+            </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate w-full">
+              {t("products.addProduct")}
+            </span>
+          </Link>
+        )}
       </div>
 
       {/* Stock Health Alert Banner */}

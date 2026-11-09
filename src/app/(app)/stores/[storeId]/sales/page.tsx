@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getSales } from "@/app/actions/sales";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,30 @@ export default async function SalesPage({
   });
   const t = await getTranslations();
 
+  const salesCsvHeaders = [
+    "Sale Number",
+    "Date",
+    `Subtotal (${store.currency})`,
+    `Discount (${store.currency})`,
+    `Total Amount (${store.currency})`,
+    "Payment Method",
+    "Status",
+    "Cashier / Staff",
+    "Notes",
+  ];
+
+  const salesCsvRows = sales.map((s) => [
+    s.saleNumber,
+    new Date(s.soldAt).toLocaleString(),
+    Number(s.subtotal) || 0,
+    Number(s.discountAmount) || 0,
+    Number(s.totalAmount) || 0,
+    METHOD_LABELS[s.paymentMethod] || s.paymentMethod,
+    s.status,
+    s.createdByName || s.createdByEmail || "Staff",
+    s.notes || "",
+  ]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -67,12 +92,19 @@ export default async function SalesPage({
           </p>
         </div>
 
-        <Link href={`/stores/${storeId}/sales/new`}>
-          <Button className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
-            <Plus className="w-4 h-4" />
-            <span>{t("sales.newSale")}</span>
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          <ExportCsvButton
+            filename={`${store.name}-sales-${new Date().toISOString().slice(0, 10)}`}
+            headers={salesCsvHeaders}
+            rows={salesCsvRows}
+          />
+          <Link href={`/stores/${storeId}/sales/new`}>
+            <Button className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm font-semibold">
+              <Plus className="w-4 h-4" />
+              <span>{t("sales.newSale")}</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filter Tabs */}

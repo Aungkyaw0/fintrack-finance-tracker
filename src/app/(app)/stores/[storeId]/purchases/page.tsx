@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getPurchases } from "@/app/actions/purchases";
+import { getUserStoreRole } from "@/app/actions/members";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +27,35 @@ export default async function PurchasesPage({
   const store = await getStoreById(storeId);
   if (!store) notFound();
 
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    redirect(`/stores/${storeId}/dashboard`);
+  }
+
   const purchases = await getPurchases(storeId);
   const t = await getTranslations();
+
+  const purchaseCsvHeaders = [
+    "Purchase Number",
+    "Date",
+    "Supplier",
+    `Shipping Cost (${store.currency})`,
+    `Total Amount (${store.currency})`,
+    "Status",
+    "Purchaser / Staff",
+    "Notes",
+  ];
+
+  const purchaseCsvRows = purchases.map((p) => [
+    p.purchaseNumber,
+    new Date(p.purchasedAt).toLocaleString(),
+    p.supplierName || "No Supplier",
+    Number(p.shippingCost) || 0,
+    Number(p.totalAmount) || 0,
+    p.status,
+    p.createdByName || p.createdByEmail || "Staff",
+    p.notes || "",
+  ]);
 
   return (
     <div className="space-y-6">
@@ -41,12 +70,19 @@ export default async function PurchasesPage({
           </p>
         </div>
 
-        <Link href={`/stores/${storeId}/purchases/new`}>
-          <Button className="gap-1.5 shadow-sm font-semibold">
-            <Plus className="w-4 h-4" />
-            <span>{t("purchases.newPurchase")}</span>
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          <ExportCsvButton
+            filename={`${store.name}-purchases-${new Date().toISOString().slice(0, 10)}`}
+            headers={purchaseCsvHeaders}
+            rows={purchaseCsvRows}
+          />
+          <Link href={`/stores/${storeId}/purchases/new`}>
+            <Button className="gap-1.5 shadow-sm font-semibold">
+              <Plus className="w-4 h-4" />
+              <span>{t("purchases.newPurchase")}</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Purchases List */}
