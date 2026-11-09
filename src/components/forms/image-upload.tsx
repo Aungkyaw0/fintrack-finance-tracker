@@ -66,7 +66,7 @@ export function ImageUpload({
       />
 
       {value ? (
-        <div className="relative w-36 h-36 rounded-xl overflow-hidden border border-border group bg-slate-100">
+        <div className="relative w-36 h-36 rounded-xl overflow-hidden border border-border group bg-muted">
           <Image
             src={value}
             alt="Product"
@@ -88,16 +88,16 @@ export function ImageUpload({
       ) : (
         <div
           onClick={() => !uploading && fileInputRef.current?.click()}
-          className="w-36 h-36 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-50/50 hover:bg-indigo-50/30 transition-colors p-4 text-center"
+          className="w-36 h-36 border-2 border-dashed border-border hover:border-primary rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer bg-muted/30 hover:bg-primary/5 transition-colors p-4 text-center"
         >
           {uploading ? (
-            <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
           ) : (
             <>
-              <div className="p-2.5 rounded-full bg-indigo-50 text-indigo-600">
+              <div className="p-2.5 rounded-full bg-primary/10 text-primary">
                 <Camera className="w-5 h-5" />
               </div>
-              <span className="text-xs font-medium text-slate-600">
+              <span className="text-xs font-medium text-muted-foreground">
                 Upload Image
               </span>
             </>

@@ -59,7 +59,7 @@ export default async function SalesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("sales.title")} &amp; Timeline
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -80,7 +80,9 @@ export default async function SalesPage({
         <Link
           href={`/stores/${storeId}/sales`}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-            !method ? "bg-indigo-600 text-white" : "bg-white border text-slate-600 hover:bg-slate-50"
+            !method
+              ? "bg-primary text-primary-foreground shadow-xs"
+              : "bg-card border text-muted-foreground hover:text-foreground hover:bg-muted/50"
           }`}
         >
           All Methods
@@ -91,8 +93,8 @@ export default async function SalesPage({
             href={`/stores/${storeId}/sales?method=${m}`}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
               method === m
-                ? "bg-indigo-600 text-white"
-                : "bg-white border text-slate-600 hover:bg-slate-50"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-card border text-muted-foreground hover:text-foreground hover:bg-muted/50"
             }`}
           >
             {METHOD_LABELS[m] || m}
@@ -102,19 +104,19 @@ export default async function SalesPage({
 
       {/* Sales List */}
       {sales.length === 0 ? (
-        <Card>
+        <Card className="bg-card">
           <CardContent className="py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
               <ShoppingCart className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("sales.noSales")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
               Create your first sale to start recording revenue and tracking customer payment receipts.
             </p>
             <Link href={`/stores/${storeId}/sales/new`}>
-              <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
                 <Plus className="w-4 h-4" />
                 {t("sales.newSale")}
               </Button>
@@ -131,7 +133,7 @@ export default async function SalesPage({
                 href={`/stores/${storeId}/sales/${s.id}`}
                 className="block"
               >
-                <Card className="hover:border-indigo-300 transition-colors bg-white">
+                <Card className="hover:border-primary/40 transition-colors bg-card shadow-2xs">
                   <CardContent className="p-4 space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -191,7 +193,7 @@ export default async function SalesPage({
                 </TableHeader>
                 <TableBody>
                   {sales.map((s) => (
-                    <TableRow key={s.id} className="hover:bg-slate-50/70">
+                    <TableRow key={s.id} className="hover:bg-muted/40">
                       <TableCell className="font-mono font-medium text-xs text-indigo-600">
                         <Link
                           href={`/stores/${storeId}/sales/${s.id}`}

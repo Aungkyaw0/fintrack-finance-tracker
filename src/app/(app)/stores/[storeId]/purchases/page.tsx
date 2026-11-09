@@ -33,7 +33,7 @@ export default async function PurchasesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("purchases.title")} (Stock-In)
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -42,7 +42,7 @@ export default async function PurchasesPage({
         </div>
 
         <Link href={`/stores/${storeId}/purchases/new`}>
-          <Button className="gap-1.5 shadow-sm">
+          <Button className="gap-1.5 shadow-sm font-semibold">
             <Plus className="w-4 h-4" />
             <span>{t("purchases.newPurchase")}</span>
           </Button>
@@ -51,12 +51,12 @@ export default async function PurchasesPage({
 
       {/* Purchases List */}
       {purchases.length === 0 ? (
-        <Card>
+        <Card className="bg-card">
           <CardContent className="py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
               <Truck className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("purchases.noPurchases")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
@@ -81,7 +81,7 @@ export default async function PurchasesPage({
                 href={`/stores/${storeId}/purchases/${p.id}`}
                 className="block"
               >
-                <Card className="hover:border-indigo-300 transition-colors bg-white">
+                <Card className="hover:border-primary/40 transition-colors bg-card shadow-2xs">
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -93,13 +93,13 @@ export default async function PurchasesPage({
                             {t("status." + p.status) || p.status}
                           </Badge>
                         </div>
-                        <p className="text-xs font-medium text-slate-800 mt-1">
+                        <p className="text-xs font-medium text-foreground mt-1">
                           {p.supplierName ? p.supplierName : "Direct / No Supplier"}
                         </p>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-base font-bold text-gray-900 block">
+                        <span className="text-base font-bold text-foreground block">
                           {Number(p.totalAmount).toLocaleString()} {store.currency}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
@@ -138,8 +138,8 @@ export default async function PurchasesPage({
                 </TableHeader>
                 <TableBody>
                   {purchases.map((p) => (
-                    <TableRow key={p.id} className="hover:bg-slate-50/70">
-                      <TableCell className="font-mono font-medium text-xs text-indigo-600">
+                    <TableRow key={p.id} className="hover:bg-muted/40">
+                      <TableCell className="font-mono font-medium text-xs text-primary">
                         <Link
                           href={`/stores/${storeId}/purchases/${p.id}`}
                           className="hover:underline"
@@ -147,7 +147,7 @@ export default async function PurchasesPage({
                           {p.purchaseNumber}
                         </Link>
                       </TableCell>
-                      <TableCell className="text-xs text-gray-900">
+                      <TableCell className="text-xs text-foreground">
                         {p.supplierName ? (
                           <span className="font-medium">{p.supplierName}</span>
                         ) : (
@@ -162,7 +162,7 @@ export default async function PurchasesPage({
                           ? `${Number(p.shippingCost).toLocaleString()} ${store.currency}`
                           : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-xs text-gray-900">
+                      <TableCell className="text-right font-semibold text-xs text-foreground">
                         {Number(p.totalAmount).toLocaleString()} {store.currency}
                       </TableCell>
                       <TableCell className="text-center">

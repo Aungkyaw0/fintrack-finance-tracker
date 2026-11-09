@@ -48,7 +48,7 @@ export function UserMenu({ user }: { user: UserProfileProps }) {
               {user.avatarUrl && (
                 <AvatarImage src={user.avatarUrl} alt={user.fullName || ""} />
               )}
-              <AvatarFallback className="bg-indigo-100 text-indigo-700 font-semibold text-xs">
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>

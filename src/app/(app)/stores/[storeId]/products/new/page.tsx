@@ -19,7 +19,7 @@ export default async function NewProductPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {t("products.addProduct")}
         </h1>
         <p className="text-xs text-muted-foreground mt-1">

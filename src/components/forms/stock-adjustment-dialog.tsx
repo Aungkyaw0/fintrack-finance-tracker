@@ -166,9 +166,9 @@ export function StockAdjustmentDialog({
           </div>
 
           {/* New Stock Preview */}
-          <div className="p-3 rounded-lg bg-slate-50 border flex items-center justify-between text-xs">
+          <div className="p-3 rounded-lg bg-muted/30 border border-border flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Updated Stock Preview:</span>
-            <span className="font-bold text-gray-900">
+            <span className="font-bold text-foreground">
               {currentStock} →{" "}
               <span className={change < 0 ? "text-rose-600" : "text-emerald-600"}>
                 {newStockPreview}

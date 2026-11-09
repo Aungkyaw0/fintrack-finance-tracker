@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -60,11 +61,18 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${geist.variable} font-sans antialiased`}>
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          {children}
-          <Toaster position="top-center" richColors />
-        </NextIntlClientProvider>
+      <body className={`${geist.variable} font-sans antialiased bg-background text-foreground min-h-screen`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider messages={messages} locale={locale}>
+            {children}
+            <Toaster position="top-center" richColors />
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

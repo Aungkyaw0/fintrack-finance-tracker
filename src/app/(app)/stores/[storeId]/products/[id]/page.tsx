@@ -74,7 +74,7 @@ export default async function ProductDetailPage({
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 {product.name}
               </h1>
               {product.categoryName && (
@@ -111,8 +111,8 @@ export default async function ProductDetailPage({
       {/* Main Grid: Details & Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Product Image Card */}
-        <Card className="flex flex-col items-center justify-center p-6 bg-white">
-          <div className="w-48 h-48 rounded-2xl bg-slate-100 overflow-hidden relative border flex items-center justify-center shadow-xs">
+        <Card className="flex flex-col items-center justify-center p-6 bg-card">
+          <div className="w-48 h-48 rounded-2xl bg-muted overflow-hidden relative border flex items-center justify-center shadow-xs">
             {product.imageUrl ? (
               <Image
                 src={product.imageUrl}
@@ -122,7 +122,7 @@ export default async function ProductDetailPage({
                 sizes="192px"
               />
             ) : (
-              <Package className="w-16 h-16 text-slate-300" />
+              <Package className="w-16 h-16 text-muted-foreground/40" />
             )}
           </div>
           {product.description && (
@@ -135,7 +135,7 @@ export default async function ProductDetailPage({
         {/* Key Metrics */}
         <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Current Stock */}
-          <Card className="border-indigo-100 bg-white">
+          <Card className="border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
                 {t("products.currentStock")}
@@ -143,7 +143,7 @@ export default async function ProductDetailPage({
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
-                <span className="text-3xl font-extrabold text-gray-900">
+                <span className="text-3xl font-extrabold text-foreground">
                   {product.currentStock}
                 </span>
                 <Badge
@@ -155,7 +155,7 @@ export default async function ProductDetailPage({
                       : "secondary"
                   }
                   className={`text-xs ${
-                    isLowStock ? "bg-amber-100 text-amber-800" : ""
+                    isLowStock ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" : ""
                   }`}
                 >
                   {isOutOfStock
@@ -172,45 +172,45 @@ export default async function ProductDetailPage({
           </Card>
 
           {/* Unit Profit */}
-          <Card className="border-indigo-100 bg-white">
+          <Card className="border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
                 {t("products.estimatedProfit")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-extrabold text-indigo-600">
+              <div className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
                 +{profitPerUnit.toLocaleString()} {store.currency}
               </div>
               <p className="text-[11px] text-muted-foreground mt-2">
-                {t("products.margin")}: <span className="font-semibold text-emerald-600">{marginPercent}%</span>
+                {t("products.margin")}: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{marginPercent}%</span>
               </p>
             </CardContent>
           </Card>
 
           {/* Cost Price */}
-          <Card className="border-slate-200 bg-white">
+          <Card className="border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
                 {t("products.costPrice")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-800">
+              <div className="text-2xl font-bold text-foreground">
                 {cost.toLocaleString()} {store.currency}
               </div>
             </CardContent>
           </Card>
 
           {/* Selling Price */}
-          <Card className="border-slate-200 bg-white">
+          <Card className="border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
                 {t("products.sellingPrice")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-foreground">
                 {sell.toLocaleString()} {store.currency}
               </div>
             </CardContent>

@@ -32,7 +32,7 @@ export default async function SuppliersPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("suppliers.title")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -45,12 +45,12 @@ export default async function SuppliersPage({
 
       {/* Suppliers List */}
       {suppliers.length === 0 ? (
-        <Card>
+        <Card className="bg-card">
           <CardContent className="py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("suppliers.noSuppliers")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
@@ -64,14 +64,14 @@ export default async function SuppliersPage({
           {/* Mobile Card List (No horizontal scroll!) */}
           <div className="space-y-3 md:hidden">
             {suppliers.map((s) => (
-              <Card key={s.id} className="bg-white">
+              <Card key={s.id} className="bg-card shadow-2xs hover:border-primary/40 transition-colors">
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="font-bold text-sm text-gray-900">{s.name}</h4>
+                      <h4 className="font-bold text-sm text-foreground">{s.name}</h4>
                       {s.phone && (
-                        <p className="text-xs text-indigo-600 font-mono mt-0.5 flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-slate-400" />
+                        <p className="text-xs text-primary font-mono mt-0.5 flex items-center gap-1">
+                          <Phone className="w-3 h-3 text-muted-foreground/60" />
                           {s.phone}
                         </p>
                       )}
@@ -92,13 +92,13 @@ export default async function SuppliersPage({
 
                   {s.address && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1 border-t">
-                      <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                      <MapPin className="w-3 h-3 text-muted-foreground/60 shrink-0" />
                       <span>{s.address}</span>
                     </p>
                   )}
 
                   {s.notes && (
-                    <p className="text-xs text-slate-600 italic">
+                    <p className="text-xs text-muted-foreground italic">
                       {s.notes}
                     </p>
                   )}
@@ -124,8 +124,8 @@ export default async function SuppliersPage({
                 </TableHeader>
                 <TableBody>
                   {suppliers.map((s) => (
-                    <TableRow key={s.id} className="hover:bg-slate-50/70">
-                      <TableCell className="font-medium text-gray-900">
+                    <TableRow key={s.id} className="hover:bg-muted/40">
+                      <TableCell className="font-medium text-foreground">
                         {s.name}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">

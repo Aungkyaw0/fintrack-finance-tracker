@@ -76,14 +76,14 @@ export function StoreNav({ storeId }: { storeId: string }) {
               className={cn(
                 "flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap",
                 isActive
-                  ? "bg-indigo-50 text-indigo-700 font-semibold shadow-xs"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  ? "bg-primary/10 text-primary font-semibold shadow-2xs"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
               )}
             >
               <Icon
                 className={cn(
                   "w-4 h-4",
-                  isActive ? "text-indigo-600" : "text-muted-foreground"
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )}
               />
               <span>{item.title}</span>

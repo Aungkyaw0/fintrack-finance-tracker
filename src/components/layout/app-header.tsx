@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserStores } from "@/app/actions/stores";
 import { StoreSwitcher } from "./store-switcher";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 export async function AppHeader({
@@ -20,9 +21,9 @@ export async function AppHeader({
         <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-bold text-lg text-indigo-600 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 font-bold text-lg text-primary hover:opacity-90 transition-opacity"
           >
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
               F
             </div>
             <span className="hidden sm:inline-block">FinTrack</span>
@@ -40,8 +41,9 @@ export async function AppHeader({
           )}
         </div>
 
-        {/* Right: Language + User Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Right: Language + Theme + User Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <ThemeToggle />
           <LanguageSwitcher variant="ghost" />
           {user && (
             <UserMenu

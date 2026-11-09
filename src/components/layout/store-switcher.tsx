@@ -44,7 +44,7 @@ export function StoreSwitcher({
               className="h-9 px-3 gap-2 font-medium bg-background max-w-[200px] sm:max-w-[260px] justify-between"
             >
               <div className="flex items-center gap-2 truncate">
-                <Store className="w-4 h-4 text-indigo-600 shrink-0" />
+                <Store className="w-4 h-4 text-primary shrink-0" />
                 <span className="truncate">
                   {currentStore ? currentStore.name : t("stores.switchStore")}
                 </span>

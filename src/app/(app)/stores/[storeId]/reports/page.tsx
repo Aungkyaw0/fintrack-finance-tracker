@@ -66,7 +66,7 @@ export default async function ReportsPage({
       {/* Header & Date Range switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("reports.title")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -75,7 +75,7 @@ export default async function ReportsPage({
         </div>
 
         {/* Days Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-muted p-1 rounded-xl">
           {[
             { label: t("reports.days7"), d: 7 },
             { label: t("reports.days30"), d: 30 },
@@ -86,8 +86,8 @@ export default async function ReportsPage({
               href={`/stores/${storeId}/reports?days=${item.d}`}
               className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
                 days === item.d
-                  ? "bg-white text-indigo-600 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-background text-primary shadow-xs font-bold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {item.label}
@@ -97,9 +97,9 @@ export default async function ReportsPage({
       </div>
 
       {/* Primary Profit & Loss Statement Card */}
-      <Card className="border-indigo-100 bg-linear-to-br from-white to-indigo-50/20 shadow-xs">
+      <Card className="border bg-card shadow-xs">
         <CardHeader>
-          <CardTitle className="text-base font-bold text-gray-900">
+          <CardTitle className="text-base font-bold text-foreground">
             {t("reports.incomeStatement")} — {t("reports.lastDays", { days })}
           </CardTitle>
           <CardDescription className="text-xs">
@@ -112,14 +112,14 @@ export default async function ReportsPage({
             <div className="flex justify-between items-center py-2 border-b">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-foreground">
                   {t("reports.totalSalesRevenue")}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {t("reports.salesCount", { count: report.salesCount })}
                 </span>
               </div>
-              <span className="text-base font-bold text-emerald-600">
+              <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">
                 +{formatCurrency(report.totalRevenue)}
               </span>
             </div>
@@ -128,28 +128,28 @@ export default async function ReportsPage({
             <div className="flex justify-between items-center py-2 border-b">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-foreground">
                   {t("reports.cogsTitle")}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {t("reports.cogsSub")}
                 </span>
               </div>
-              <span className="text-base font-medium text-amber-700">
+              <span className="text-base font-medium text-amber-600 dark:text-amber-400">
                 −{formatCurrency(report.totalCOGS)}
               </span>
             </div>
 
             {/* Gross Profit */}
-            <div className="flex justify-between items-center py-2 border-b bg-indigo-50/50 px-3 rounded-lg">
-              <span className="text-sm font-bold text-indigo-900">
+            <div className="flex justify-between items-center py-2 border-b bg-primary/5 px-3 rounded-lg">
+              <span className="text-sm font-bold text-primary">
                 {t("reports.grossProfitTitle")}
               </span>
               <div className="text-right">
-                <span className="text-base font-bold text-indigo-700">
+                <span className="text-base font-bold text-primary">
                   {formatCurrency(report.grossProfit)}
                 </span>
-                <span className="text-[11px] text-indigo-600 block">
+                <span className="text-[11px] text-primary/80 block">
                   {t("reports.grossMargin")}: {grossMarginPercent}%
                 </span>
               </div>
@@ -159,14 +159,14 @@ export default async function ReportsPage({
             <div className="flex justify-between items-center py-2 border-b">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-foreground">
                   {t("reports.totalOperatingExpenses")}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {t("reports.operatingExpensesSub")}
                 </span>
               </div>
-              <span className="text-base font-medium text-rose-600">
+              <span className="text-base font-medium text-rose-600 dark:text-rose-400">
                 −{formatCurrency(report.totalExpenses)}
               </span>
             </div>
@@ -175,8 +175,8 @@ export default async function ReportsPage({
             <div
               className={`flex justify-between items-center py-3 px-3 rounded-xl border ${
                 report.netProfit >= 0
-                  ? "bg-emerald-50 border-emerald-200 text-emerald-950"
-                  : "bg-rose-50 border-rose-200 text-rose-950"
+                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-950 dark:text-emerald-200"
+                  : "bg-rose-500/10 border-rose-500/20 text-rose-950 dark:text-rose-200"
               }`}
             >
               <div>
@@ -189,7 +189,9 @@ export default async function ReportsPage({
               </div>
               <span
                 className={`text-2xl font-black ${
-                  report.netProfit >= 0 ? "text-emerald-700" : "text-rose-600"
+                  report.netProfit >= 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-rose-600 dark:text-rose-400"
                 }`}
               >
                 {report.netProfit >= 0 ? "+" : ""}
@@ -225,7 +227,7 @@ export default async function ReportsPage({
                 return (
                   <div key={pm.method} className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="font-semibold text-gray-800">
+                      <span className="font-semibold text-foreground">
                         {METHOD_LABELS[pm.method] || pm.method}
                       </span>
                       <span className="text-muted-foreground">
@@ -261,10 +263,10 @@ export default async function ReportsPage({
                     className="flex items-center justify-between py-2.5"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                      <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                         {idx + 1}
                       </span>
-                      <span className="text-xs font-semibold text-gray-900">
+                      <span className="text-xs font-semibold text-foreground">
                         {p.productName}
                       </span>
                     </div>
@@ -295,7 +297,7 @@ export default async function ReportsPage({
               {report.expenseCategoriesBreakdown.map((exp) => (
                 <div
                   key={exp.category}
-                  className="p-3 rounded-xl bg-slate-50 border space-y-1"
+                  className="p-3 rounded-xl bg-muted/30 border border-border space-y-1"
                 >
                   <span className="text-[11px] font-semibold text-muted-foreground uppercase capitalize block truncate">
                     {exp.category}

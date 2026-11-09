@@ -25,14 +25,14 @@ export default async function DashboardOverviewPage() {
   const t = await getTranslations();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <AppHeader />
 
       <main className="flex-1 p-4 sm:p-8 max-w-6xl w-full mx-auto space-y-8">
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {t("stores.myStores")}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -46,11 +46,11 @@ export default async function DashboardOverviewPage() {
 
         {/* Stores Grid or Empty State */}
         {stores.length === 0 ? (
-          <div className="bg-white border border-dashed rounded-2xl p-8 sm:p-12 text-center max-w-lg mx-auto shadow-xs">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-card border border-dashed rounded-2xl p-8 sm:p-12 text-center max-w-lg mx-auto shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
               <Store className="w-8 h-8" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               {t("stores.noStores")}
             </h2>
             <p className="text-sm text-muted-foreground mb-6">
@@ -59,7 +59,7 @@ export default async function DashboardOverviewPage() {
             </p>
             <CreateStoreDialog
               trigger={
-                <Button size="lg" className="gap-2 shadow-sm">
+                <Button size="lg" className="gap-2 shadow-sm font-semibold">
                   <Plus className="w-5 h-5" />
                   <span>{t("stores.createStore")}</span>
                 </Button>
@@ -71,18 +71,18 @@ export default async function DashboardOverviewPage() {
             {stores.map((store) => (
               <Card
                 key={store.id}
-                className="hover:shadow-md transition-shadow flex flex-col justify-between border-slate-200"
+                className="hover:shadow-md transition-shadow flex flex-col justify-between border bg-card shadow-2xs"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
-                    <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
                       <Store className="w-5 h-5" />
                     </div>
                     <Badge variant="secondary" className="font-semibold text-xs">
                       {store.currency}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg font-bold text-gray-900 mt-2 truncate">
+                  <CardTitle className="text-lg font-bold text-foreground mt-2 truncate">
                     {store.name}
                   </CardTitle>
                   {store.description && (
@@ -91,12 +91,12 @@ export default async function DashboardOverviewPage() {
                     </CardDescription>
                   )}
                 </CardHeader>
-                <CardFooter className="pt-2 border-t bg-slate-50/50 rounded-b-xl flex justify-between items-center">
+                <CardFooter className="pt-2 border-t bg-muted/30 rounded-b-xl flex justify-between items-center">
                   <span className="text-xs text-muted-foreground">
                     {new Date(store.createdAt).toLocaleDateString()}
                   </span>
                   <Link href={`/stores/${store.id}/dashboard`}>
-                    <Button size="sm" className="gap-1 text-xs">
+                    <Button size="sm" className="gap-1 text-xs font-semibold">
                       <span>{t("dashboard.title")}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>

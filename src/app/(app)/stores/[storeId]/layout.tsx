@@ -22,7 +22,7 @@ export default async function StoreLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <AppHeader currentStoreId={storeId} />
       <StoreNav storeId={storeId} />
       <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto pb-24 sm:pb-8">

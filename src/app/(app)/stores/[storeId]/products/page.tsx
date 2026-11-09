@@ -52,7 +52,7 @@ export default async function ProductsPage({
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("products.title")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -66,7 +66,7 @@ export default async function ProductsPage({
             categories={categories}
           />
           <Link href={`/stores/${storeId}/products/new`}>
-            <Button className="gap-1.5 shadow-sm">
+            <Button className="gap-1.5 shadow-sm font-semibold">
               <Plus className="w-4 h-4" />
               <span>{t("products.addProduct")}</span>
             </Button>
@@ -75,7 +75,7 @@ export default async function ProductsPage({
       </div>
 
       {/* Filter / Search bar */}
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardContent className="p-3">
           <form method="GET" className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -84,7 +84,7 @@ export default async function ProductsPage({
                 name="q"
                 placeholder={`${t("common.search")} ${t("products.productName")} / SKU...`}
                 defaultValue={q || ""}
-                className="pl-9 h-9 text-sm"
+                className="pl-9 h-9 text-sm bg-background"
               />
             </div>
             {/* Category filter pills */}
@@ -93,8 +93,8 @@ export default async function ProductsPage({
                 href={`/stores/${storeId}/products${q ? `?q=${q}` : ""}`}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                   !category
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                 }`}
               >
                 All
@@ -107,8 +107,8 @@ export default async function ProductsPage({
                   }`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                     category === c.id
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                   }`}
                 >
                   <span
@@ -130,7 +130,7 @@ export default async function ProductsPage({
             <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
               <Package className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("products.noProducts")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
@@ -159,10 +159,10 @@ export default async function ProductsPage({
                   href={`/stores/${storeId}/products/${p.id}`}
                   className="block"
                 >
-                  <Card className="hover:border-indigo-300 transition-colors bg-white">
+                  <Card className="hover:border-primary/40 transition-colors bg-card shadow-2xs">
                     <CardContent className="p-3.5 flex items-center gap-3">
                       {/* Thumbnail */}
-                      <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden relative border shrink-0 flex items-center justify-center">
                         {p.imageUrl ? (
                           <Image
                             src={p.imageUrl}
@@ -172,17 +172,17 @@ export default async function ProductsPage({
                             sizes="64px"
                           />
                         ) : (
-                          <Package className="w-7 h-7 text-slate-400" />
+                          <Package className="w-7 h-7 text-muted-foreground/40" />
                         )}
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1">
-                          <h4 className="font-semibold text-sm text-gray-900 truncate">
+                          <h4 className="font-semibold text-sm text-foreground truncate">
                             {p.name}
                           </h4>
-                          <span className="font-bold text-sm text-gray-900 shrink-0">
+                          <span className="font-bold text-sm text-foreground shrink-0">
                             {Number(p.sellingPrice).toLocaleString()} {store.currency}
                           </span>
                         </div>
@@ -204,7 +204,7 @@ export default async function ProductsPage({
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-100">
+                        <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/60">
                           <span className="text-[11px] text-muted-foreground">
                             Cost: {Number(p.costPrice).toLocaleString()} {store.currency}
                           </span>
@@ -268,10 +268,10 @@ export default async function ProductsPage({
                       !isOutOfStock && p.currentStock <= p.lowStockThreshold;
 
                     return (
-                      <TableRow key={p.id} className="hover:bg-slate-50/70">
+                      <TableRow key={p.id} className="hover:bg-muted/40">
                         {/* Thumbnail */}
                         <TableCell>
-                          <div className="w-11 h-11 rounded-lg bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
+                          <div className="w-11 h-11 rounded-lg bg-muted overflow-hidden relative border shrink-0 flex items-center justify-center">
                             {p.imageUrl ? (
                               <Image
                                 src={p.imageUrl}
@@ -281,7 +281,7 @@ export default async function ProductsPage({
                                 sizes="44px"
                               />
                             ) : (
-                              <Package className="w-5 h-5 text-slate-400" />
+                              <Package className="w-5 h-5 text-muted-foreground/40" />
                             )}
                           </div>
                         </TableCell>
@@ -290,7 +290,7 @@ export default async function ProductsPage({
                         <TableCell>
                           <Link
                             href={`/stores/${storeId}/products/${p.id}`}
-                            className="font-medium text-gray-900 hover:text-indigo-600 transition-colors line-clamp-1"
+                            className="font-medium text-foreground hover:text-primary transition-colors line-clamp-1"
                           >
                             {p.name}
                           </Link>
@@ -327,7 +327,7 @@ export default async function ProductsPage({
                         </TableCell>
 
                         {/* Selling Price */}
-                        <TableCell className="text-right font-semibold text-xs sm:text-sm text-gray-900">
+                        <TableCell className="text-right font-semibold text-xs sm:text-sm text-foreground">
                           {Number(p.sellingPrice).toLocaleString()} {store.currency}
                         </TableCell>
 

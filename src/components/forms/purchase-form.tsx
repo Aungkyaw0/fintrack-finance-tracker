@@ -45,8 +45,8 @@ interface ProductOption {
 interface LineItem {
   id: string;
   productId: string;
-  quantity: number;
-  unitCost: number;
+  quantity: number | "";
+  unitCost: number | "";
 }
 
 export function PurchaseForm({
@@ -87,20 +87,45 @@ export function PurchaseForm({
         ...copy[index],
         productId: prodId,
         unitCost: prod ? Number(prod.costPrice) : 0,
+        quantity: 1,
       };
       return copy;
     });
   }
 
-  function handleQuantityChange(index: number, qty: number) {
+  function handleQuantityChange(index: number, valStr: string) {
+    if (valStr === "") {
+      setItems((prev) => {
+        const copy = [...prev];
+        copy[index] = { ...copy[index], quantity: "" };
+        return copy;
+      });
+      return;
+    }
+
+    const qty = parseInt(valStr, 10);
+    if (isNaN(qty)) return;
+
     setItems((prev) => {
       const copy = [...prev];
-      copy[index] = { ...copy[index], quantity: Math.max(1, qty) };
+      copy[index] = { ...copy[index], quantity: qty };
       return copy;
     });
   }
 
-  function handleCostChange(index: number, cost: number) {
+  function handleCostChange(index: number, valStr: string) {
+    if (valStr === "") {
+      setItems((prev) => {
+        const copy = [...prev];
+        copy[index] = { ...copy[index], unitCost: "" };
+        return copy;
+      });
+      return;
+    }
+
+    const cost = parseFloat(valStr);
+    if (isNaN(cost)) return;
+
     setItems((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], unitCost: Math.max(0, cost) };
@@ -127,7 +152,7 @@ export function PurchaseForm({
 
   // Calculations
   const subtotal = items.reduce(
-    (acc, it) => acc + it.quantity * it.unitCost,
+    (acc, it) => acc + (Number(it.quantity) || 0) * (Number(it.unitCost) || 0),
     0
   );
   const shipping = Number(shippingCost) || 0;
@@ -141,6 +166,14 @@ export function PurchaseForm({
       return;
     }
 
+    for (const it of items) {
+      const q = Number(it.quantity);
+      if (!q || q <= 0) {
+        toast.error("Please enter a valid quantity for all items.");
+        return;
+      }
+    }
+
     setLoading(true);
     const res = await createPurchaseAction(storeId, {
       supplierId: supplierId === "none" ? null : supplierId,
@@ -149,8 +182,8 @@ export function PurchaseForm({
       invoiceScreenshot,
       items: items.map((it) => ({
         productId: it.productId,
-        quantity: it.quantity,
-        unitCost: it.unitCost,
+        quantity: Number(it.quantity) || 1,
+        unitCost: Number(it.unitCost) || 0,
       })),
     });
     setLoading(false);
@@ -170,7 +203,7 @@ export function PurchaseForm({
       <Card>
         <CardContent className="py-12 text-center space-y-3">
           <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
-          <h3 className="font-semibold text-gray-900">No products found</h3>
+          <h3 className="font-semibold text-foreground">No products found</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             You need to add products to your inventory before you can record purchases.
           </p>
@@ -288,17 +321,17 @@ export function PurchaseForm({
               {items.map((item, idx) => (
                 <div
                   key={item.id}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3"
+                  className="p-3.5 sm:p-4 rounded-xl bg-slate-100/70 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-3.5"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-slate-500">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                       Item #{idx + 1}
                     </span>
                     {items.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeItem(idx)}
-                        className="text-slate-400 hover:text-rose-600 transition-colors"
+                        className="text-muted-foreground hover:text-destructive transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -307,14 +340,14 @@ export function PurchaseForm({
 
                   {/* Product selector */}
                   <div>
-                    <Label className="text-xs mb-1 block">
+                    <Label className="text-xs mb-1 block font-medium text-slate-800 dark:text-slate-200">
                       {t("products.productName")}
                     </Label>
                     <Select
                       value={item.productId}
                       onValueChange={(val) => handleProductChange(idx, val || "")}
                     >
-                      <SelectTrigger className="w-full bg-white">
+                      <SelectTrigger className="w-full bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100">
                         <SelectValue placeholder="Choose product...">
                           {(val) => {
                             const p = products.find((x) => x.id === val);
@@ -335,7 +368,7 @@ export function PurchaseForm({
                   {/* Quantity & Unit Cost */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs mb-1 block">
+                      <Label className="text-xs mb-1 block font-medium text-slate-800 dark:text-slate-200">
                         {t("sales.quantity")}
                       </Label>
                       <Input
@@ -344,14 +377,19 @@ export function PurchaseForm({
                         step="1"
                         value={item.quantity}
                         onChange={(e) =>
-                          handleQuantityChange(idx, parseInt(e.target.value) || 1)
+                          handleQuantityChange(idx, e.target.value)
                         }
-                        className="bg-white"
+                        onBlur={() => {
+                          if (item.quantity === "" || Number(item.quantity) < 1) {
+                            handleQuantityChange(idx, "1");
+                          }
+                        }}
+                        className="bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                         required
                       />
                     </div>
                     <div>
-                      <Label className="text-xs mb-1 block">
+                      <Label className="text-xs mb-1 block font-medium text-slate-800 dark:text-slate-200">
                         Unit Cost ({currency})
                       </Label>
                       <Input
@@ -360,18 +398,21 @@ export function PurchaseForm({
                         step="any"
                         value={item.unitCost}
                         onChange={(e) =>
-                          handleCostChange(idx, parseFloat(e.target.value) || 0)
+                          handleCostChange(idx, e.target.value)
                         }
-                        className="bg-white"
+                        onBlur={() => {
+                          if (item.unitCost === "") handleCostChange(idx, "0");
+                        }}
+                        className="bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="text-right text-xs text-muted-foreground pt-1 border-t">
+                  <div className="text-right text-xs text-muted-foreground pt-1 border-t border-slate-200 dark:border-slate-800">
                     Subtotal:{" "}
-                    <b className="text-gray-900">
-                      {(item.quantity * item.unitCost).toLocaleString()} {currency}
+                    <b className="text-slate-900 dark:text-slate-100 font-bold">
+                      {((Number(item.quantity) || 0) * (Number(item.unitCost) || 0)).toLocaleString()} {currency}
                     </b>
                   </div>
                 </div>
@@ -410,7 +451,7 @@ export function PurchaseForm({
               </div>
 
               <div className="pt-3 border-t flex justify-between items-baseline">
-                <span className="text-base font-bold text-gray-900">
+                <span className="text-base font-bold text-foreground">
                   {t("common.total")}:
                 </span>
                 <span className="text-2xl font-extrabold text-indigo-600">
@@ -436,7 +477,7 @@ export function PurchaseForm({
               className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>Confirm Stock-In (+{items.reduce((a, b) => a + b.quantity, 0)} units)</span>
+              <span>Confirm Stock-In (+{items.reduce((a, b) => a + (Number(b.quantity) || 0), 0)} units)</span>
             </Button>
           </div>
         </div>

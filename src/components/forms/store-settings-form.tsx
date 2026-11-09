@@ -148,9 +148,9 @@ export function StoreSettingsForm({
       </Card>
 
       {/* Danger Zone */}
-      <Card className="border-rose-200 bg-rose-50/20">
+      <Card className="border-destructive/30 bg-destructive/5">
         <CardHeader>
-          <CardTitle className="text-base text-rose-700">Danger Zone</CardTitle>
+          <CardTitle className="text-base text-destructive">Danger Zone</CardTitle>
           <CardDescription className="text-xs">
             Irreversible store project deletion
           </CardDescription>
@@ -158,7 +158,7 @@ export function StoreSettingsForm({
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-gray-900">
+              <p className="text-sm font-semibold text-foreground">
                 Delete Store Project
               </p>
               <p className="text-xs text-muted-foreground">

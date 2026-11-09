@@ -65,7 +65,7 @@ export default async function SaleDetailPage({
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-mono">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">
                 {sale.saleNumber}
               </h1>
               <Badge
@@ -95,11 +95,11 @@ export default async function SaleDetailPage({
         {/* Left Column: Payment Screenshot & Notes */}
         <div className="space-y-6">
           {/* Payment Evidence Screenshot */}
-          <Card className="border-indigo-100">
+          <Card className="border bg-card">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <QrCode className="w-4 h-4 text-indigo-600" />
-                <CardTitle className="text-sm font-semibold text-gray-900">
+                <QrCode className="w-4 h-4 text-primary" />
+                <CardTitle className="text-sm font-semibold text-foreground">
                   {t("sales.paymentScreenshot")}
                 </CardTitle>
               </div>
@@ -109,7 +109,7 @@ export default async function SaleDetailPage({
             </CardHeader>
             <CardContent>
               {screenshots.length === 0 ? (
-                <div className="text-center py-6 border border-dashed rounded-xl bg-slate-50/50">
+                <div className="text-center py-6 border border-dashed rounded-xl bg-muted/30">
                   <p className="text-xs text-muted-foreground">
                     No screenshot attached.
                   </p>
@@ -122,7 +122,7 @@ export default async function SaleDetailPage({
                       href={s.storagePath}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block relative aspect-4/3 rounded-xl overflow-hidden border bg-slate-100 hover:opacity-95 transition-opacity shadow-xs"
+                      className="block relative aspect-4/3 rounded-xl overflow-hidden border bg-muted hover:opacity-95 transition-opacity shadow-xs"
                     >
                       <Image
                         src={s.storagePath}
@@ -142,14 +142,14 @@ export default async function SaleDetailPage({
 
           {/* Notes Card */}
           {sale.notes && (
-            <Card>
+            <Card className="border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
                   {t("common.notes")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xs text-slate-700 whitespace-pre-wrap">
+                <p className="text-xs text-foreground whitespace-pre-wrap">
                   {sale.notes}
                 </p>
               </CardContent>
@@ -175,7 +175,7 @@ export default async function SaleDetailPage({
                       >
                         {it.productName}
                       </Link>
-                      <span className="text-xs font-bold text-gray-900">
+                      <span className="text-xs font-bold text-foreground">
                         {Number(it.lineTotal).toLocaleString()} {store.currency}
                       </span>
                     </div>
@@ -234,7 +234,7 @@ export default async function SaleDetailPage({
               </div>
 
               {/* Totals Breakdown */}
-              <div className="p-4 border-t space-y-2 bg-slate-50/50">
+              <div className="p-4 border-t space-y-2 bg-muted/30">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{t("sales.subtotal")}:</span>
                   <span>
@@ -242,7 +242,7 @@ export default async function SaleDetailPage({
                   </span>
                 </div>
                 {Number(sale.discountAmount) > 0 && (
-                  <div className="flex justify-between text-xs text-rose-600">
+                  <div className="flex justify-between text-xs text-rose-600 dark:text-rose-400">
                     <span>{t("sales.discount")}:</span>
                     <span>
                       −{Number(sale.discountAmount).toLocaleString()}{" "}
@@ -251,7 +251,7 @@ export default async function SaleDetailPage({
                   </div>
                 )}
                 <div className="flex justify-between items-baseline pt-2 border-t font-bold">
-                  <span className="text-sm text-gray-900">
+                  <span className="text-sm text-foreground">
                     {t("sales.totalAmount")}:
                   </span>
                   <span className="text-xl text-emerald-600">

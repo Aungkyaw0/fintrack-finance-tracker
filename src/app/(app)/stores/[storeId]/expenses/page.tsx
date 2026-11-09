@@ -49,12 +49,12 @@ export default async function ExpensesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("expenses.title")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Total:{" "}
-            <b className="text-rose-600">
+            <b className="text-rose-600 dark:text-rose-400">
               {totalExpenseSum.toLocaleString()} {store.currency}
             </b>{" "}
             across {expenses.length} records
@@ -66,12 +66,12 @@ export default async function ExpensesPage({
 
       {/* Expenses List */}
       {expenses.length === 0 ? (
-        <Card>
+        <Card className="bg-card">
           <CardContent className="py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3">
               <Receipt className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("expenses.noExpenses")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
@@ -85,7 +85,7 @@ export default async function ExpensesPage({
           {/* Mobile Card List (No horizontal scroll!) */}
           <div className="space-y-3 md:hidden">
             {expenses.map((e) => (
-              <Card key={e.id} className="bg-white">
+              <Card key={e.id} className="bg-card shadow-2xs hover:border-primary/40 transition-colors">
                 <CardContent className="p-3.5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     {e.receiptUrl ? (
@@ -93,7 +93,7 @@ export default async function ExpensesPage({
                         href={e.receiptUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block relative w-12 h-12 rounded-lg overflow-hidden border bg-slate-100 shrink-0 shadow-xs"
+                        className="block relative w-12 h-12 rounded-lg overflow-hidden border bg-muted shrink-0 shadow-xs"
                       >
                         <Image
                           src={e.receiptUrl}
@@ -104,7 +104,7 @@ export default async function ExpensesPage({
                         />
                       </a>
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
                         <Receipt className="w-5 h-5" />
                       </div>
                     )}
@@ -118,7 +118,7 @@ export default async function ExpensesPage({
                         </span>
                       </div>
                       {e.description && (
-                        <p className="text-xs text-slate-700 font-medium truncate mt-1">
+                        <p className="text-xs text-foreground font-medium truncate mt-1">
                           {e.description}
                         </p>
                       )}
@@ -126,7 +126,7 @@ export default async function ExpensesPage({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-sm font-bold text-rose-600 block">
+                    <span className="text-sm font-bold text-rose-600 dark:text-rose-400 block">
                       −{Number(e.amount).toLocaleString()} {store.currency}
                     </span>
                   </div>
@@ -150,14 +150,14 @@ export default async function ExpensesPage({
                 </TableHeader>
                 <TableBody>
                   {expenses.map((e) => (
-                    <TableRow key={e.id} className="hover:bg-slate-50/70">
+                    <TableRow key={e.id} className="hover:bg-muted/40">
                       <TableCell>
                         {e.receiptUrl ? (
                           <a
                             href={e.receiptUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block relative w-9 h-9 rounded-lg overflow-hidden border bg-slate-100 shrink-0 hover:opacity-80 transition-opacity"
+                            className="block relative w-9 h-9 rounded-lg overflow-hidden border bg-muted shrink-0 hover:opacity-80 transition-opacity"
                           >
                             <Image
                               src={e.receiptUrl}
@@ -168,7 +168,7 @@ export default async function ExpensesPage({
                             />
                           </a>
                         ) : (
-                          <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                          <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                             <Receipt className="w-4 h-4" />
                           </div>
                         )}
@@ -178,13 +178,13 @@ export default async function ExpensesPage({
                           {CAT_LABELS[e.category] || e.category}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-slate-700 max-w-sm truncate">
+                      <TableCell className="text-xs text-foreground max-w-sm truncate">
                         {e.description || "—"}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(e.expenseDate).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-xs sm:text-sm text-rose-600">
+                      <TableCell className="text-right font-bold text-xs sm:text-sm text-rose-600 dark:text-rose-400">
                         −{Number(e.amount).toLocaleString()} {store.currency}
                       </TableCell>
                     </TableRow>

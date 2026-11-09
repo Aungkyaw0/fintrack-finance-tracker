@@ -25,6 +25,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useTranslations } from "next-intl";
+import { ThemeToggle } from "./theme-toggle";
 
 interface BottomNavProps {
   storeId?: string;
@@ -140,7 +141,7 @@ export function BottomNav({ storeId }: BottomNavProps) {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 active:scale-95 transition-transform">
             <PlusCircle className="h-6 w-6" />
           </div>
-          <span className="text-[10px] font-semibold text-emerald-700 mt-1">
+          <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
             {t("newSale")}
           </span>
         </Link>
@@ -179,8 +180,12 @@ export function BottomNav({ storeId }: BottomNavProps) {
             <span className="truncate max-w-[64px]">{t("more") || "More"}</span>
           </SheetTrigger>
           <SheetContent side="bottom" className="rounded-t-2xl pb-8 max-h-[85vh] overflow-y-auto">
-            <SheetHeader className="text-left pb-4 border-b">
+            <SheetHeader className="text-left pb-3 border-b flex flex-row items-center justify-between">
               <SheetTitle className="text-base font-bold">Store Menu</SheetTitle>
+              <div className="flex items-center gap-2 pr-6">
+                <span className="text-xs text-muted-foreground">Theme</span>
+                <ThemeToggle />
+              </div>
             </SheetHeader>
             <div className="grid grid-cols-1 gap-2 pt-4">
               {moreItems.map((item) => {
