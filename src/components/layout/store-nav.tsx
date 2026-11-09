@@ -1,0 +1,96 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Truck,
+  Receipt,
+  Users,
+  BarChart3,
+  Settings,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export function StoreNav({ storeId }: { storeId: string }) {
+  const t = useTranslations();
+  const pathname = usePathname();
+
+  const navItems = [
+    {
+      title: t("dashboard.title"),
+      href: `/stores/${storeId}/dashboard`,
+      icon: LayoutDashboard,
+    },
+    {
+      title: t("products.title"),
+      href: `/stores/${storeId}/products`,
+      icon: Package,
+    },
+    {
+      title: t("sales.title"),
+      href: `/stores/${storeId}/sales`,
+      icon: ShoppingCart,
+    },
+    {
+      title: t("purchases.title"),
+      href: `/stores/${storeId}/purchases`,
+      icon: Truck,
+    },
+    {
+      title: t("expenses.title"),
+      href: `/stores/${storeId}/expenses`,
+      icon: Receipt,
+    },
+    {
+      title: t("suppliers.title"),
+      href: `/stores/${storeId}/suppliers`,
+      icon: Users,
+    },
+    {
+      title: t("reports.title"),
+      href: `/stores/${storeId}/reports`,
+      icon: BarChart3,
+    },
+    {
+      title: t("settings.title"),
+      href: `/stores/${storeId}/settings`,
+      icon: Settings,
+    },
+  ];
+
+  return (
+    <div className="border-b bg-background sticky top-14 z-30 overflow-x-auto no-scrollbar">
+      <nav className="flex items-center space-x-1 px-4 sm:px-6 py-1 min-w-max">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap",
+                isActive
+                  ? "bg-indigo-50 text-indigo-700 font-semibold shadow-xs"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              <Icon
+                className={cn(
+                  "w-4 h-4",
+                  isActive ? "text-indigo-600" : "text-muted-foreground"
+                )}
+              />
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}

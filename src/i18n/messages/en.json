@@ -1,0 +1,185 @@
+{
+  "common": {
+    "appName": "FinTrack",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "total": "Total",
+    "date": "Date",
+    "notes": "Notes",
+    "status": "Status",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "loginTitle": "Welcome back",
+    "registerTitle": "Create your account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "forgotPassword": "Forgot your password?"
+  },
+  "stores": {
+    "title": "Stores",
+    "myStores": "My Stores",
+    "createStore": "Create Store",
+    "storeName": "Store Name",
+    "storeDescription": "Description",
+    "currency": "Currency",
+    "switchStore": "Switch Store",
+    "noStores": "No stores yet.",
+    "settings": "Store Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalRevenue": "Total Revenue",
+    "totalExpenses": "Total Expenses",
+    "netProfit": "Net Profit",
+    "grossProfit": "Gross Profit",
+    "todaySales": "Today's Sales",
+    "lowStockAlert": "Low Stock Alert",
+    "recentSales": "Recent Sales",
+    "salesChart": "Sales Chart",
+    "cashflow": "Cashflow"
+  },
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "productName": "Product Name",
+    "sku": "SKU",
+    "category": "Category",
+    "costPrice": "Cost Price",
+    "sellingPrice": "Selling Price",
+    "currentStock": "Current Stock",
+    "lowStockThreshold": "Low Stock Threshold",
+    "productImage": "Product Image",
+    "description": "Description",
+    "stockHistory": "Stock History",
+    "noProducts": "No products yet.",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock"
+  },
+  "categories": {
+    "title": "Categories",
+    "addCategory": "Add Category",
+    "categoryName": "Category Name",
+    "color": "Color"
+  },
+  "sales": {
+    "title": "Sales",
+    "newSale": "New Sale",
+    "saleNumber": "Sale #",
+    "selectProducts": "Select Products",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "discount": "Discount",
+    "subtotal": "Subtotal",
+    "totalAmount": "Total Amount",
+    "paymentMethod": "Payment Method",
+    "paymentScreenshot": "Payment Screenshot",
+    "confirmSale": "Confirm Sale",
+    "saleHistory": "Sale History",
+    "noSales": "No sales yet.",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "refunded": "Refunded",
+    "paymentMethods": {
+      "cash": "Cash",
+      "kbz_pay": "KBZ Pay",
+      "wave_pay": "Wave Pay",
+      "aya_pay": "AYA Pay",
+      "bank_transfer": "Bank Transfer",
+      "other": "Other"
+    }
+  },
+  "purchases": {
+    "title": "Purchases",
+    "newPurchase": "New Purchase",
+    "purchaseNumber": "Purchase #",
+    "supplier": "Supplier",
+    "shippingCost": "Shipping Cost",
+    "purchaseHistory": "Purchase History",
+    "noPurchases": "No purchases yet."
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "addSupplier": "Add Supplier",
+    "supplierName": "Name",
+    "phone": "Phone",
+    "address": "Address",
+    "noSuppliers": "No suppliers yet."
+  },
+  "expenses": {
+    "title": "Expenses",
+    "addExpense": "Add Expense",
+    "category": "Category",
+    "amount": "Amount",
+    "description": "Description",
+    "expenseDate": "Date",
+    "noExpenses": "No expenses yet.",
+    "categories": {
+      "rent": "Rent",
+      "salary": "Salary",
+      "packaging": "Packaging",
+      "delivery": "Delivery",
+      "advertising": "Advertising",
+      "electricity": "Electricity",
+      "internet": "Internet",
+      "other": "Other"
+    }
+  },
+  "stock": {
+    "adjustment": "Stock Adjustment",
+    "adjustmentReason": "Reason",
+    "reasons": {
+      "loss": "Loss",
+      "damage": "Damage",
+      "correction": "Correction",
+      "other": "Other"
+    },
+    "movementHistory": "Stock Movement History"
+  },
+  "reports": {
+    "title": "Reports",
+    "monthly": "Monthly",
+    "weekly": "Weekly",
+    "daily": "Daily",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "profit": "Profit",
+    "bestSelling": "Best Selling",
+    "cashflow": "Cashflow"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "language": "Language",
+    "burmese": "Burmese",
+    "english": "English",
+    "storeLogo": "Store Logo"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Not found.",
+    "unauthorized": "Unauthorized.",
+    "insufficientStock": "Insufficient stock.",
+    "required": "This field is required."
+  }
+}
+
