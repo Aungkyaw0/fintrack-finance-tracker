@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
 import crypto from "crypto";
 import { getCurrentUser } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser();
@@ -26,16 +25,31 @@ export async function POST(request: NextRequest) {
     const uniqueId = crypto.randomBytes(16).toString("hex");
     const filename = `${Date.now()}-${uniqueId}.${ext}`;
 
-    const uploadDir = path.join(process.cwd(), "public", "images", "uploads");
-    const filepath = path.join(uploadDir, filename);
+    const supabase = await createAdminClient();
 
-    await writeFile(filepath, buffer);
+    // Upload to Supabase Storage bucket 'uploads'
+    const { error: uploadError } = await supabase.storage
+      .from("uploads")
+      .upload(filename, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: true,
+      });
 
-    const publicUrl = `/images/uploads/${filename}`;
+    if (uploadError) {
+      console.error("Supabase storage upload error:", uploadError);
+      return NextResponse.json(
+        { error: uploadError.message || "Failed to upload image" },
+        { status: 500 }
+      );
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("uploads").getPublicUrl(filename);
+
     return NextResponse.json({ success: true, url: publicUrl });
   } catch (error) {
     console.error("Upload failed:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
-
