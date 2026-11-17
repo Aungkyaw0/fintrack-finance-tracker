@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import "./globals.css";
 
 const geist = Geist({
@@ -15,6 +16,15 @@ export const metadata: Metadata = {
   title: "FinTrack — Store Finance Manager",
   description: "Track your store inventory, sales, cashflow and profit",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -73,6 +83,7 @@ export default async function RootLayout({
         >
           <NextIntlClientProvider messages={messages} locale={locale}>
             {children}
+            <PwaInstallPrompt />
             <Toaster position="top-center" richColors />
           </NextIntlClientProvider>
         </ThemeProvider>
