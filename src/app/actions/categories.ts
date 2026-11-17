@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
 import { categories } from "@/lib/schema";
 import { eq, and, asc } from "drizzle-orm";
@@ -33,6 +34,11 @@ export async function createCategoryAction(
   const store = await getStoreById(storeId);
   if (!store) return { error: "Store not found" };
 
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff cannot manage categories." };
+  }
+
   if (!data.name?.trim()) {
     return { error: "Category name is required" };
   }
@@ -58,6 +64,11 @@ export async function createCategoryAction(
 export async function deleteCategoryAction(storeId: string, categoryId: string) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff cannot delete categories." };
+  }
 
   try {
     await db

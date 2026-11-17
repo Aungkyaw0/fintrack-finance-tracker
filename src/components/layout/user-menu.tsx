@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
+import { signOutAction } from "@/app/actions/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -25,14 +26,13 @@ interface UserProfileProps {
 export function UserMenu({ user }: { user: UserProfileProps }) {
   const t = useTranslations();
   const router = useRouter();
-  const supabase = createClient();
 
   const initials = (user.fullName || user.email || "U")
     .substring(0, 2)
     .toUpperCase();
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
+    await signOutAction();
     toast.success(t("auth.logout"));
     router.push("/auth/login");
     router.refresh();
@@ -47,7 +47,7 @@ export function UserMenu({ user }: { user: UserProfileProps }) {
               {user.avatarUrl && (
                 <AvatarImage src={user.avatarUrl} alt={user.fullName || ""} />
               )}
-              <AvatarFallback className="bg-indigo-100 text-indigo-700 font-semibold text-xs">
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -55,16 +55,18 @@ export function UserMenu({ user }: { user: UserProfileProps }) {
         }
       />
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none truncate">
-              {user.fullName || "User"}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground truncate">
-              {user.email}
-            </p>
-          </div>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none truncate">
+                {user.fullName || "User"}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground truncate">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}

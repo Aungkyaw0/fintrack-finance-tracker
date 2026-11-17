@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserStores } from "@/app/actions/stores";
 import { StoreSwitcher } from "./store-switcher";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 export async function AppHeader({
@@ -14,18 +15,18 @@ export async function AppHeader({
   const stores = await getUserStores();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 overflow-hidden">
+      <div className="flex h-14 items-center justify-between px-2.5 sm:px-6 w-full max-w-full">
         {/* Left: Brand + Store Switcher */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4 min-w-0 flex-1 sm:flex-initial mr-1 sm:mr-0">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-bold text-lg text-indigo-600 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 font-bold text-lg text-primary hover:opacity-90 transition-opacity shrink-0"
           >
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
               F
             </div>
-            <span className="hidden sm:inline-block">FinTrack</span>
+            <span className="hidden md:inline-block">FinTrack</span>
           </Link>
 
           {stores.length > 0 && (
@@ -40,8 +41,9 @@ export async function AppHeader({
           )}
         </div>
 
-        {/* Right: Language + User Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Right: Language + Theme + User Profile */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <ThemeToggle />
           <LanguageSwitcher variant="ghost" />
           {user && (
             <UserMenu

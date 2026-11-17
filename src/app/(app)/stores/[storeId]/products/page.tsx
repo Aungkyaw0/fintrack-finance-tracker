@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getProducts } from "@/app/actions/products";
 import { getCategories } from "@/app/actions/categories";
+import { getUserStoreRole } from "@/app/actions/members";
 import { CategoryManagerDialog } from "@/components/forms/category-manager-dialog";
+import { ExportCsvButton } from "@/components/common/export-csv-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +42,9 @@ export default async function ProductsPage({
   const store = await getStoreById(storeId);
   if (!store) notFound();
 
+  const role = await getUserStoreRole(storeId);
+  const canManage = role === "owner" || role === "manager";
+
   const t = await getTranslations();
   const products = await getProducts(storeId, {
     search: q,
@@ -47,12 +52,42 @@ export default async function ProductsPage({
   });
   const categories = await getCategories(storeId);
 
+  const productCsvHeaders = [
+    "Product Name",
+    "SKU",
+    "Category",
+    ...(canManage ? [`Cost Price (${store.currency})`] : []),
+    `Selling Price (${store.currency})`,
+    "Current Stock",
+    "Low Stock Threshold",
+    ...(canManage ? [`Total Stock Value (${store.currency})`] : []),
+    "Status",
+  ];
+
+  const productCsvRows = products.map((p) => [
+    p.name,
+    p.sku || "",
+    p.categoryName || "Uncategorized",
+    ...(canManage ? [Number(p.costPrice) || 0] : []),
+    Number(p.sellingPrice) || 0,
+    p.currentStock,
+    p.lowStockThreshold,
+    ...(canManage ? [(Number(p.costPrice) || 0) * p.currentStock] : []),
+    p.isActive
+      ? p.currentStock <= p.lowStockThreshold
+        ? p.currentStock === 0
+          ? "Out of Stock"
+          : "Low Stock"
+        : "In Stock"
+      : "Inactive",
+  ]);
+
   return (
     <div className="space-y-6">
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             {t("products.title")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -61,21 +96,30 @@ export default async function ProductsPage({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <CategoryManagerDialog
-            storeId={storeId}
-            categories={categories}
+          <ExportCsvButton
+            filename={`${store.name}-products-${new Date().toISOString().slice(0, 10)}`}
+            headers={productCsvHeaders}
+            rows={productCsvRows}
           />
-          <Link href={`/stores/${storeId}/products/new`}>
-            <Button className="gap-1.5 shadow-sm">
-              <Plus className="w-4 h-4" />
-              <span>{t("products.addProduct")}</span>
-            </Button>
-          </Link>
+          {canManage && (
+            <>
+              <CategoryManagerDialog
+                storeId={storeId}
+                categories={categories}
+              />
+              <Link href={`/stores/${storeId}/products/new`}>
+                <Button className="gap-1.5 shadow-sm font-semibold">
+                  <Plus className="w-4 h-4" />
+                  <span>{t("products.addProduct")}</span>
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
       {/* Filter / Search bar */}
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardContent className="p-3">
           <form method="GET" className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -84,7 +128,7 @@ export default async function ProductsPage({
                 name="q"
                 placeholder={`${t("common.search")} ${t("products.productName")} / SKU...`}
                 defaultValue={q || ""}
-                className="pl-9 h-9 text-sm"
+                className="pl-9 h-9 text-sm bg-background"
               />
             </div>
             {/* Category filter pills */}
@@ -93,8 +137,8 @@ export default async function ProductsPage({
                 href={`/stores/${storeId}/products${q ? `?q=${q}` : ""}`}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                   !category
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                 }`}
               >
                 All
@@ -107,8 +151,8 @@ export default async function ProductsPage({
                   }`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                     category === c.id
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                   }`}
                 >
                   <span
@@ -123,14 +167,14 @@ export default async function ProductsPage({
         </CardContent>
       </Card>
 
-      {/* Products Table */}
+      {/* Products List */}
       {products.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
               <Package className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
+            <h3 className="font-semibold text-foreground mb-1">
               {t("products.noProducts")}
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
@@ -145,139 +189,244 @@ export default async function ProductsPage({
           </CardContent>
         </Card>
       ) : (
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead>{t("products.productName")}</TableHead>
-                  <TableHead>{t("categories.title")}</TableHead>
-                  <TableHead className="text-right">
-                    {t("products.costPrice")}
-                  </TableHead>
-                  <TableHead className="text-right">
-                    {t("products.sellingPrice")}
-                  </TableHead>
-                  <TableHead className="text-center">
-                    {t("products.currentStock")}
-                  </TableHead>
-                  <TableHead className="w-[80px] text-right">
-                    {t("common.actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((p) => {
-                  const isOutOfStock = p.currentStock <= 0;
-                  const isLowStock =
-                    !isOutOfStock && p.currentStock <= p.lowStockThreshold;
+        <>
+          {/* Mobile Card View (No horizontal scroll!) */}
+          <div className="space-y-3 md:hidden">
+            {products.map((p) => {
+              const isOutOfStock = p.currentStock <= 0;
+              const isLowStock =
+                !isOutOfStock && p.currentStock <= p.lowStockThreshold;
 
-                  return (
-                    <TableRow key={p.id} className="hover:bg-slate-50/70">
+              return (
+                <Link
+                  key={p.id}
+                  href={`/stores/${storeId}/products/${p.id}`}
+                  className="block"
+                >
+                  <Card className="hover:border-primary/40 transition-colors bg-card shadow-2xs">
+                    <CardContent className="p-3.5 flex items-center gap-3">
                       {/* Thumbnail */}
-                      <TableCell>
-                        <div className="w-11 h-11 rounded-lg bg-slate-100 overflow-hidden relative border shrink-0 flex items-center justify-center">
-                          {p.imageUrl ? (
-                            <Image
-                              src={p.imageUrl}
-                              alt={p.name}
-                              fill
-                              className="object-cover"
-                              sizes="44px"
-                            />
-                          ) : (
-                            <Package className="w-5 h-5 text-slate-400" />
+                      <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden relative border shrink-0 flex items-center justify-center">
+                        {p.imageUrl ? (
+                          <Image
+                            src={p.imageUrl}
+                            alt={p.name}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        ) : (
+                          <Package className="w-7 h-7 text-muted-foreground/40" />
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1">
+                          <h4 className="font-semibold text-sm text-foreground truncate">
+                            {p.name}
+                          </h4>
+                          <span className="font-bold text-sm text-foreground shrink-0">
+                            {Number(p.sellingPrice).toLocaleString()} {store.currency}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-1">
+                          {p.sku && (
+                            <span className="text-[11px] text-muted-foreground font-mono">
+                              {p.sku}
+                            </span>
+                          )}
+                          {p.categoryName && (
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-normal">
+                              <span
+                                className="w-1.5 h-1.5 rounded-full mr-1"
+                                style={{ backgroundColor: p.categoryColor || "#6366f1" }}
+                              />
+                              {p.categoryName}
+                            </Badge>
                           )}
                         </div>
-                      </TableCell>
 
-                      {/* Product Name & SKU */}
-                      <TableCell>
-                        <Link
-                          href={`/stores/${storeId}/products/${p.id}`}
-                          className="font-medium text-gray-900 hover:text-indigo-600 transition-colors line-clamp-1"
-                        >
-                          {p.name}
-                        </Link>
-                        {p.sku && (
-                          <span className="text-[11px] text-muted-foreground block font-mono">
-                            SKU: {p.sku}
-                          </span>
-                        )}
-                      </TableCell>
-
-                      {/* Category */}
-                      <TableCell>
-                        {p.categoryName ? (
+                        <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/60">
+                          {canManage ? (
+                            <span className="text-[11px] text-muted-foreground">
+                              Cost: {Number(p.costPrice).toLocaleString()} {store.currency}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">
+                              {p.sku || ""}
+                            </span>
+                          )}
                           <Badge
-                            variant="outline"
-                            className="text-xs font-normal"
+                            variant={
+                              isOutOfStock
+                                ? "destructive"
+                                : isLowStock
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-[10px] font-semibold py-0.5 ${
+                              isLowStock
+                                ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                                : ""
+                            }`}
                           >
-                            <span
-                              className="w-1.5 h-1.5 rounded-full mr-1.5"
-                              style={{
-                                backgroundColor: p.categoryColor || "#6366f1",
-                              }}
-                            />
-                            {p.categoryName}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-
-                      {/* Cost Price */}
-                      <TableCell className="text-right text-xs text-muted-foreground">
-                        {Number(p.costPrice).toLocaleString()} {store.currency}
-                      </TableCell>
-
-                      {/* Selling Price */}
-                      <TableCell className="text-right font-semibold text-xs sm:text-sm text-gray-900">
-                        {Number(p.sellingPrice).toLocaleString()} {store.currency}
-                      </TableCell>
-
-                      {/* Stock Badge */}
-                      <TableCell className="text-center">
-                        <Badge
-                          variant={
-                            isOutOfStock
-                              ? "destructive"
+                            {p.currentStock}{" "}
+                            {isOutOfStock
+                              ? `(${t("products.outOfStock")})`
                               : isLowStock
-                              ? "default"
-                              : "secondary"
-                          }
-                          className={`text-xs font-semibold ${
-                            isLowStock
-                              ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                              : ""
-                          }`}
-                        >
-                          {p.currentStock}{" "}
-                          {isOutOfStock
-                            ? `(${t("products.outOfStock")})`
-                            : isLowStock
-                            ? `(${t("products.lowStock")})`
-                            : ""}
-                        </Badge>
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell className="text-right">
-                        <Link href={`/stores/${storeId}/products/${p.id}`}>
-                          <Button variant="ghost" size="sm" className="h-8 px-2 text-indigo-600">
-                            <Eye className="w-4 h-4 mr-1" />
-                            <span className="text-xs">View</span>
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                              ? `(${t("products.lowStock")})`
+                              : `(${t("products.inStock")})`}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
-        </Card>
+
+          {/* Desktop Table View */}
+          <Card className="hidden md:block overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">Image</TableHead>
+                    <TableHead>{t("products.productName")}</TableHead>
+                    <TableHead>{t("categories.title")}</TableHead>
+                    {canManage && (
+                      <TableHead className="text-right">
+                        {t("products.costPrice")}
+                      </TableHead>
+                    )}
+                    <TableHead className="text-right">
+                      {t("products.sellingPrice")}
+                    </TableHead>
+                    <TableHead className="text-center">
+                      {t("products.currentStock")}
+                    </TableHead>
+                    <TableHead className="w-[80px] text-right">
+                      {t("common.actions")}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {products.map((p) => {
+                    const isOutOfStock = p.currentStock <= 0;
+                    const isLowStock =
+                      !isOutOfStock && p.currentStock <= p.lowStockThreshold;
+
+                    return (
+                      <TableRow key={p.id} className="hover:bg-muted/40">
+                        {/* Thumbnail */}
+                        <TableCell>
+                          <div className="w-11 h-11 rounded-lg bg-muted overflow-hidden relative border shrink-0 flex items-center justify-center">
+                            {p.imageUrl ? (
+                              <Image
+                                src={p.imageUrl}
+                                alt={p.name}
+                                fill
+                                className="object-cover"
+                                sizes="44px"
+                              />
+                            ) : (
+                              <Package className="w-5 h-5 text-muted-foreground/40" />
+                            )}
+                          </div>
+                        </TableCell>
+
+                        {/* Product Name & SKU */}
+                        <TableCell>
+                          <Link
+                            href={`/stores/${storeId}/products/${p.id}`}
+                            className="font-medium text-foreground hover:text-primary transition-colors line-clamp-1"
+                          >
+                            {p.name}
+                          </Link>
+                          {p.sku && (
+                            <span className="text-[11px] text-muted-foreground block font-mono">
+                              SKU: {p.sku}
+                            </span>
+                          )}
+                        </TableCell>
+
+                        {/* Category */}
+                        <TableCell>
+                          {p.categoryName ? (
+                            <Badge
+                              variant="outline"
+                              className="text-xs font-normal"
+                            >
+                              <span
+                                className="w-1.5 h-1.5 rounded-full mr-1.5"
+                                style={{
+                                  backgroundColor: p.categoryColor || "#6366f1",
+                                }}
+                              />
+                              {p.categoryName}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+
+                        {/* Cost Price */}
+                        {canManage && (
+                          <TableCell className="text-right text-xs text-muted-foreground">
+                            {Number(p.costPrice).toLocaleString()} {store.currency}
+                          </TableCell>
+                        )}
+
+                        {/* Selling Price */}
+                        <TableCell className="text-right font-semibold text-xs sm:text-sm text-foreground">
+                          {Number(p.sellingPrice).toLocaleString()} {store.currency}
+                        </TableCell>
+
+                        {/* Stock Badge */}
+                        <TableCell className="text-center">
+                          <Badge
+                            variant={
+                              isOutOfStock
+                                ? "destructive"
+                                : isLowStock
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-xs font-semibold ${
+                              isLowStock
+                                ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                                : ""
+                            }`}
+                          >
+                            {p.currentStock}{" "}
+                            {isOutOfStock
+                              ? `(${t("products.outOfStock")})`
+                              : isLowStock
+                              ? `(${t("products.lowStock")})`
+                              : ""}
+                          </Badge>
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell className="text-right">
+                          <Link href={`/stores/${storeId}/products/${p.id}`}>
+                            <Button variant="ghost" size="sm" className="h-8 px-2 text-indigo-600">
+                              <Eye className="w-4 h-4 mr-1" />
+                              <span className="text-xs">View</span>
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </Card>
+        </>
       )}
     </div>
   );

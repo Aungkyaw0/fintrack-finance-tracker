@@ -2,8 +2,9 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { getStoreById } from "@/app/actions/stores";
+import { getUserStoreRole } from "@/app/actions/members";
 import { db } from "@/lib/db";
-import { products, categories, stockMovements } from "@/lib/schema";
+import { products, categories, stockMovements, users } from "@/lib/schema";
 import { eq, and, desc, sql, ilike } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -104,10 +105,24 @@ export async function getProductById(storeId: string, productId: string) {
 
     if (!product) return null;
 
-    // Fetch stock movements
+    // Fetch stock movements with audit user info
     const movements = await db
-      .select()
+      .select({
+        id: stockMovements.id,
+        productId: stockMovements.productId,
+        referenceId: stockMovements.referenceId,
+        referenceType: stockMovements.referenceType,
+        movementType: stockMovements.movementType,
+        quantityChange: stockMovements.quantityChange,
+        stockBefore: stockMovements.stockBefore,
+        stockAfter: stockMovements.stockAfter,
+        notes: stockMovements.notes,
+        createdAt: stockMovements.createdAt,
+        createdByName: users.fullName,
+        createdByEmail: users.email,
+      })
       .from(stockMovements)
+      .leftJoin(users, eq(users.id, stockMovements.createdBy))
       .where(eq(stockMovements.productId, productId))
       .orderBy(desc(stockMovements.createdAt))
       .limit(50);
@@ -128,6 +143,11 @@ export async function createProductAction(
 
   const store = await getStoreById(storeId);
   if (!store) return { error: "Store not found" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff cannot create products." };
+  }
 
   if (!data.name?.trim()) {
     return { error: "Product name is required" };
@@ -191,6 +211,11 @@ export async function updateProductAction(
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
 
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff cannot edit products." };
+  }
+
   try {
     const updatePayload: Record<string, unknown> = {
       updatedAt: new Date(),
@@ -229,6 +254,11 @@ export async function adjustStockAction(
 ) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
+
+  const role = await getUserStoreRole(storeId);
+  if (!role || role === "staff") {
+    return { error: "Permission denied: Staff cannot adjust stock inventory." };
+  }
 
   if (change === 0) {
     return { error: "Quantity change cannot be 0" };

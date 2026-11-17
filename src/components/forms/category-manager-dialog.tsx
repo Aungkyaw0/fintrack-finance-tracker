@@ -167,21 +167,21 @@ export function CategoryManagerDialog({
               {categories.map((c) => (
                 <div
                   key={c.id}
-                  className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border text-sm"
+                  className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border text-sm"
                 >
                   <div className="flex items-center gap-2">
                     <span
                       className="w-3 h-3 rounded-full shrink-0"
                       style={{ backgroundColor: c.color || "#6366f1" }}
                     />
-                    <span className="font-medium text-slate-800">{c.name}</span>
+                    <span className="font-medium text-foreground">{c.name}</span>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeleteCategory(c.id)}
                     disabled={deletingId === c.id}
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-red-600"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>

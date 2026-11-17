@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getStoreById } from "@/app/actions/stores";
 import { getCategories } from "@/app/actions/categories";
 import { ProductForm } from "@/components/forms/product-form";
+import { BackButton } from "@/components/ui/back-button";
 import { getTranslations } from "next-intl/server";
 
 export default async function NewProductPage({
@@ -18,13 +19,16 @@ export default async function NewProductPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-          {t("products.addProduct")}
-        </h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          {store.name} · Enter product details and pricing
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href={`/stores/${storeId}/products`} />
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {t("products.addProduct")}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {store.name} · Enter product details and pricing
+          </p>
+        </div>
       </div>
 
       <ProductForm

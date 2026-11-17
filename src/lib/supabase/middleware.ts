@@ -17,8 +17,13 @@ export async function updateSession(request: NextRequest) {
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({ request });
+          const isHttps = request.nextUrl.protocol === "https:";
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              secure: isHttps ? options?.secure : false,
+              sameSite: (isHttps ? options?.sameSite : "lax") as "lax" | "strict" | "none",
+            })
           );
         },
       },

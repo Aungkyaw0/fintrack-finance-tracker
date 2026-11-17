@@ -1,12 +1,13 @@
 "use server";
 
+import { cache } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stores, storeMembers } from "@/lib/schema";
-import { eq, or, desc } from "drizzle-orm";
+import { eq, or, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function getUserStores() {
+export const getUserStores = cache(async function getUserStores() {
   const user = await getCurrentUser();
   if (!user) return [];
 
@@ -37,9 +38,9 @@ export async function getUserStores() {
     console.error("Failed to fetch stores:", error);
     return [];
   }
-}
+});
 
-export async function getStoreById(storeId: string) {
+export const getStoreById = cache(async function getStoreById(storeId: string) {
   const user = await getCurrentUser();
   if (!user) return null;
 
@@ -58,17 +59,22 @@ export async function getStoreById(storeId: string) {
     const [member] = await db
       .select()
       .from(storeMembers)
-      .where(eq(storeMembers.storeId, storeId))
+      .where(
+        and(
+          eq(storeMembers.storeId, storeId),
+          eq(storeMembers.userId, user.id)
+        )
+      )
       .limit(1);
 
-    if (member && member.userId === user.id) return store;
+    if (member) return store;
 
     return null;
   } catch (error) {
     console.error("Failed to get store by id:", error);
     return null;
   }
-}
+});
 
 export async function createStoreAction(formData: {
   name: string;
