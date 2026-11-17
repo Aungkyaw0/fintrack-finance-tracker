@@ -355,11 +355,11 @@ export function SaleForm({
                     className={`p-3.5 sm:p-4 rounded-xl border transition-colors space-y-3.5 ${
                       isOverStock
                         ? "bg-destructive/10 border-destructive/40"
-                        : "bg-slate-100/70 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800"
+                        : "bg-muted/30 dark:bg-muted/10 border-border"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                      <span className="text-xs font-semibold text-muted-foreground">
                         Item #{idx + 1}
                       </span>
                       {items.length > 1 && (
@@ -375,7 +375,7 @@ export function SaleForm({
 
                     {/* Product Selector */}
                     <div>
-                      <Label className="text-xs mb-1 block font-medium text-slate-800 dark:text-slate-200">
+                      <Label className="text-xs mb-1 block font-medium text-foreground">
                         {t("products.productName")}
                       </Label>
                       <Select
@@ -384,7 +384,7 @@ export function SaleForm({
                           handleProductChange(idx, val || "")
                         }
                       >
-                        <SelectTrigger className="w-full bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100">
+                        <SelectTrigger className="w-full bg-background border-input text-foreground">
                           <SelectValue placeholder="Choose product...">
                             {(val) => {
                               const p = products.find((x) => x.id === val);
@@ -415,7 +415,7 @@ export function SaleForm({
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <Label className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                          <Label className="text-xs font-medium text-foreground">
                             {t("sales.quantity")}
                           </Label>
                           {prod && (
@@ -436,6 +436,7 @@ export function SaleForm({
                           max={maxStock > 0 ? maxStock : 1}
                           step="1"
                           value={item.quantity}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) =>
                             handleQuantityChange(idx, e.target.value)
                           }
@@ -444,13 +445,13 @@ export function SaleForm({
                               handleQuantityChange(idx, "1");
                             }
                           }}
-                          className="bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                          className="bg-background border-input text-foreground font-semibold"
                           required
                         />
                       </div>
 
                       <div>
-                        <Label className="text-xs mb-1 block font-medium text-slate-800 dark:text-slate-200">
+                        <Label className="text-xs mb-1 block font-medium text-foreground">
                           {t("sales.unitPrice")} ({currency})
                         </Label>
                         <Input
@@ -458,21 +459,22 @@ export function SaleForm({
                           min="0"
                           step="any"
                           value={item.unitPrice}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) =>
                             handlePriceChange(idx, e.target.value)
                           }
                           onBlur={() => {
                             if (item.unitPrice === "") handlePriceChange(idx, "0");
                           }}
-                          className="bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                          className="bg-background border-input text-foreground font-semibold"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="text-right text-xs text-muted-foreground pt-1 border-t border-slate-200 dark:border-slate-800">
+                    <div className="text-right text-xs text-muted-foreground pt-1 border-t border-border">
                       Line Total:{" "}
-                      <b className="text-slate-900 dark:text-slate-100 font-bold">
+                      <b className="text-foreground font-bold">
                         {(
                           (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0)
                         ).toLocaleString()}{" "}
@@ -511,8 +513,9 @@ export function SaleForm({
                     min="0"
                     step="any"
                     value={overallDiscount}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => setOverallDiscount(e.target.value)}
-                    className="text-right h-8 text-sm"
+                    className="text-right h-8 text-sm bg-background border-input text-foreground font-semibold"
                   />
                 </div>
               </div>

@@ -25,6 +25,7 @@ const pwaConfig = withPWA({
 });
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   images: {
     remotePatterns: [
       {

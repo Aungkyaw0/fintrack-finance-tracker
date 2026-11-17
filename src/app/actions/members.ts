@@ -183,6 +183,8 @@ export async function inviteMemberAction(
     });
 
     revalidatePath(`/stores/${storeId}/settings`);
+    revalidatePath("/dashboard");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (err: unknown) {
     console.error("Failed to invite member:", err);
@@ -222,6 +224,8 @@ export async function updateMemberRoleAction(
       .where(eq(storeMembers.id, memberId));
 
     revalidatePath(`/stores/${storeId}/settings`);
+    revalidatePath("/dashboard");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (err) {
     console.error("Failed to update role:", err);
@@ -267,6 +271,8 @@ export async function removeMemberAction(storeId: string, memberId: string) {
     await db.delete(storeMembers).where(eq(storeMembers.id, memberId));
 
     revalidatePath(`/stores/${storeId}/settings`);
+    revalidatePath("/dashboard");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (err) {
     console.error("Failed to remove member:", err);

@@ -18,8 +18,15 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
+            const isProductionHttps =
+              process.env.NODE_ENV === "production" &&
+              process.env.NEXT_PUBLIC_APP_URL?.startsWith("https:");
+
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                secure: isProductionHttps ? options?.secure : false,
+              })
             );
           } catch {
             // Can be ignored in Server Components

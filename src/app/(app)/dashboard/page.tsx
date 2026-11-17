@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Store, Plus, ArrowRight, Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardOverviewPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login");
