@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
+import { signOutAction } from "@/app/actions/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,14 +26,13 @@ interface UserProfileProps {
 export function UserMenu({ user }: { user: UserProfileProps }) {
   const t = useTranslations();
   const router = useRouter();
-  const supabase = createClient();
 
   const initials = (user.fullName || user.email || "U")
     .substring(0, 2)
     .toUpperCase();
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
+    await signOutAction();
     toast.success(t("auth.logout"));
     router.push("/auth/login");
     router.refresh();

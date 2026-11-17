@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
+import { registerAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,6 @@ import { toast } from "sonner";
 export default function RegisterPage() {
   const t = useTranslations();
   const router = useRouter();
-  const supabase = createClient();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,16 +44,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email: email.trim(),
+      const res = await registerAction({
+        email,
         password,
-        options: {
-          data: { full_name: fullName.trim() },
-        },
+        fullName,
       });
 
-      if (error) {
-        toast.error(error.message || "Registration failed.");
+      if (res.error) {
+        toast.error(res.error || "Registration failed.");
         setLoading(false);
         return;
       }
@@ -98,7 +95,7 @@ export default function RegisterPage() {
       </CardHeader>
 
       <form onSubmit={handleRegister}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-1 pb-6">
           {/* Full Name with User icon */}
           <div className="space-y-1.5">
             <Label htmlFor="fullName" className="text-xs font-semibold">
@@ -174,7 +171,7 @@ export default function RegisterPage() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-3 pt-2">
+        <CardFooter className="flex flex-col gap-3.5 pt-5 pb-5 border-t border-border/50">
           <Button
             type="submit"
             className="w-full h-11 text-sm font-semibold gap-2 shadow-sm"

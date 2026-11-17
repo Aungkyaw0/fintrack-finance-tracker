@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Truck, Image as ImageIcon, Calendar, User } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { Truck, Image as ImageIcon, Calendar, User } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 export default async function PurchaseDetailPage({
@@ -36,11 +37,7 @@ export default async function PurchaseDetailPage({
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link href={`/stores/${storeId}/purchases`}>
-          <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
+        <BackButton href={`/stores/${storeId}/purchases`} />
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">

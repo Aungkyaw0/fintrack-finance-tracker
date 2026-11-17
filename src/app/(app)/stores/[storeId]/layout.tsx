@@ -14,21 +14,24 @@ export default async function StoreLayout({
   params: Promise<{ storeId: string }>;
 }) {
   const { storeId } = await params;
-  const user = await getCurrentUser();
+
+  // Concurrently fetch user, store, and role to cut latency
+  const [user, store, userRole] = await Promise.all([
+    getCurrentUser(),
+    getStoreById(storeId),
+    getUserStoreRole(storeId),
+  ]);
+
   if (!user) redirect("/auth/login");
+  if (!store) redirect("/dashboard");
 
-  const store = await getStoreById(storeId);
-  if (!store) {
-    redirect("/dashboard");
-  }
-
-  const role = (await getUserStoreRole(storeId)) || "staff";
+  const role = userRole || "staff";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden w-full max-w-full">
       <AppHeader currentStoreId={storeId} />
       <StoreNav storeId={storeId} userRole={role} />
-      <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto pb-24 sm:pb-8">
+      <main className="flex-1 p-3.5 sm:p-6 max-w-7xl w-full mx-auto pb-24 sm:pb-8 overflow-x-hidden">
         {children}
       </main>
       <BottomNav storeId={storeId} userRole={role} />

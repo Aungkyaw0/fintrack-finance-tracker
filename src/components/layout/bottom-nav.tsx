@@ -14,6 +14,7 @@ import {
   Users,
   Settings,
   Store,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -23,7 +24,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -190,12 +193,24 @@ export function BottomNav({ storeId, userRole = "staff" }: BottomNavProps) {
             <MoreHorizontal className="h-5 w-5" />
             <span className="truncate max-w-[64px]">{t("more") || "More"}</span>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl pb-8 max-h-[85vh] overflow-y-auto">
+          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-2xl pb-8 max-h-[85vh] overflow-y-auto">
             <SheetHeader className="text-left pb-3 border-b flex flex-row items-center justify-between">
               <SheetTitle className="text-base font-bold">Store Menu</SheetTitle>
-              <div className="flex items-center gap-2 pr-6">
-                <span className="text-xs text-muted-foreground">Theme</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground mr-1">Theme</span>
                 <ThemeToggle />
+                <SheetClose
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  }
+                />
               </div>
             </SheetHeader>
             <div className="grid grid-cols-1 gap-2 pt-4">

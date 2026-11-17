@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stores, storeMembers, users } from "@/lib/schema";
@@ -22,7 +23,7 @@ export interface MemberWithUser {
 /**
  * Returns the current authenticated user's role for a specific store.
  */
-export async function getUserStoreRole(
+export const getUserStoreRole = cache(async function getUserStoreRole(
   storeId: string
 ): Promise<StoreRole | null> {
   const user = await getCurrentUser();
@@ -51,7 +52,7 @@ export async function getUserStoreRole(
     console.error("Failed to get store role:", err);
     return null;
   }
-}
+});
 
 /**
  * Get all members of a store, including owner and staff.

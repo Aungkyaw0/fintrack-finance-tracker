@@ -17,8 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BackButton } from "@/components/ui/back-button";
 import {
-  ArrowLeft,
   ShoppingCart,
   QrCode,
   Calendar,
@@ -63,11 +63,7 @@ export default async function SaleDetailPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href={`/stores/${storeId}/sales`}>
-            <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <BackButton href={`/stores/${storeId}/sales`} />
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">

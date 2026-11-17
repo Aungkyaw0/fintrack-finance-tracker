@@ -537,19 +537,20 @@ export function SaleForm({
           </Card>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-end gap-3 pt-4 pb-8">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.back()}
               disabled={loading}
+              className="h-11 px-5"
             >
               {t("common.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-11 px-5 font-semibold"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <ShoppingCart className="w-4 h-4" />

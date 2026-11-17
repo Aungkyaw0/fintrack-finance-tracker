@@ -3,6 +3,7 @@ import { getStoreById } from "@/app/actions/stores";
 import { getSuppliers } from "@/app/actions/suppliers";
 import { getProducts } from "@/app/actions/products";
 import { PurchaseForm } from "@/components/forms/purchase-form";
+import { BackButton } from "@/components/ui/back-button";
 import { getTranslations } from "next-intl/server";
 
 export default async function NewPurchasePage({
@@ -20,13 +21,16 @@ export default async function NewPurchasePage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {t("purchases.newPurchase")} (Stock-In)
-        </h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          {store.name} · Record supplier purchases and increase product stock
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href={`/stores/${storeId}/purchases`} />
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {t("purchases.newPurchase")} (Stock-In)
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {store.name} · Record supplier purchases and increase product stock
+          </p>
+        </div>
       </div>
 
       <PurchaseForm

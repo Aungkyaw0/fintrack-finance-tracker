@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
+import { loginAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,6 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,13 +38,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+      const res = await loginAction({
+        email,
         password,
       });
 
-      if (error) {
-        toast.error(error.message || "Login failed. Please check your credentials.");
+      if (res.error) {
+        toast.error(res.error || "Login failed. Please check your credentials.");
         setLoading(false);
         return;
       }
@@ -90,7 +89,7 @@ export default function LoginPage() {
       </CardHeader>
 
       <form onSubmit={handleLogin}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-1 pb-6">
           {/* Email input with icon */}
           <div className="space-y-1.5">
             <Label htmlFor="email" className="text-xs font-semibold">
@@ -147,7 +146,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-3 pt-2">
+        <CardFooter className="flex flex-col gap-3.5 pt-5 pb-5 border-t border-border/50">
           <Button
             type="submit"
             className="w-full h-11 text-sm font-semibold gap-2 shadow-sm"

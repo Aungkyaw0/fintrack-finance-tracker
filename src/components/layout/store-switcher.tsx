@@ -41,15 +41,15 @@ export function StoreSwitcher({
             <Button
               variant="outline"
               size="sm"
-              className="h-9 px-3 gap-2 font-medium bg-background max-w-[200px] sm:max-w-[260px] justify-between"
+              className="h-8 sm:h-9 px-2 sm:px-3 gap-1 sm:gap-2 font-medium bg-background max-w-[125px] xs:max-w-[160px] sm:max-w-[240px] justify-between"
             >
-              <div className="flex items-center gap-2 truncate">
-                <Store className="w-4 h-4 text-primary shrink-0" />
-                <span className="truncate">
+              <div className="flex items-center gap-1.5 sm:gap-2 truncate">
+                <Store className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="truncate text-xs sm:text-sm">
                   {currentStore ? currentStore.name : t("stores.switchStore")}
                 </span>
               </div>
-              <ChevronsUpDown className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-60" />
+              <ChevronsUpDown className="w-3 h-3 text-muted-foreground shrink-0 opacity-60" />
             </Button>
           }
         />
